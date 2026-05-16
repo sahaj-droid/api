@@ -158,27 +158,119 @@
   /* === MAIN === */
   main {
     flex: 1;
-    max-width: 860px;
+    max-width: 1180px;
     width: 100%;
     margin: 0 auto;
     padding: 0 24px;
-    display: flex;
-    flex-direction: column;
     position: relative;
     z-index: 1;
   }
 
+  .app-layout {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .side-panel {
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 104px);
+    overflow-y: auto;
+    padding-bottom: 24px;
+  }
+
+  .panel-block {
+    background: rgba(17,25,22,0.86);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .panel-count {
+    color: var(--text-3);
+    font-size: 10px;
+  }
+
+  .side-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .side-item {
+    border: 1px solid rgba(29,158,117,0.14);
+    background: rgba(29,158,117,0.05);
+    border-radius: 8px;
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .side-item:hover {
+    border-color: var(--border-hover);
+    background: rgba(29,158,117,0.1);
+  }
+
+  .side-item strong {
+    display: block;
+    color: var(--text-1);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .side-item span {
+    display: block;
+    margin-top: 3px;
+    color: var(--text-3);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .mini-action {
+    background: rgba(29,158,117,0.1);
+    border: 1px solid rgba(29,158,117,0.22);
+    border-radius: 7px;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  .chat-panel {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 151px);
+  }
+
   /* === QUICK CHIPS === */
   #chips-wrap {
-    padding: 16px 0 12px;
+    padding: 14px 0 12px;
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
   }
   .chip {
     font-size: 12px;
-    padding: 5px 12px;
-    border-radius: 20px;
+    padding: 6px 12px;
+    border-radius: 7px;
     border: 1px solid var(--border);
     color: var(--text-2);
     background: var(--bg-card);
@@ -198,9 +290,9 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 16px 0 24px;
-    min-height: 400px;
+    gap: 16px;
+    padding: 12px 0 24px;
+    min-height: 360px;
   }
 
   .msg { display: flex; gap: 12px; align-items: flex-start; }
@@ -225,11 +317,11 @@
   .user .avatar svg { width: 16px; height: 16px; }
 
   .bubble {
-    max-width: 80%;
-    padding: 12px 16px;
-    border-radius: 14px;
+    max-width: min(100%, 760px);
+    padding: 14px 16px;
+    border-radius: 12px;
     font-size: 14px;
-    line-height: 1.75;
+    line-height: 1.65;
     position: relative;
   }
   .ai .bubble {
@@ -284,10 +376,78 @@
     white-space: pre-wrap;
     color: var(--teal-100);
   }
-  .bubble table { width:100%; border-collapse:collapse; font-size:13px; margin:8px 0; }
-  .bubble th { background:rgba(29,158,117,0.1); color:var(--accent); font-weight:500; padding:6px 10px; text-align:left; border:1px solid var(--border); font-size:12px; }
-  .bubble td { padding:6px 10px; border:1px solid var(--border); color:var(--text-2); }
+  .bubble table { width:100%; border-collapse:collapse; font-size:13px; margin:10px 0; table-layout: fixed; }
+  .bubble th { background:rgba(29,158,117,0.1); color:var(--accent); font-weight:500; padding:8px 10px; text-align:left; border:1px solid var(--border); font-size:12px; }
+  .bubble td { padding:8px 10px; border:1px solid var(--border); color:var(--text-2); vertical-align:top; word-break:break-word; }
   .bubble tr:hover td { background:rgba(29,158,117,0.04); }
+
+  .drug-profile {
+    display: grid;
+    gap: 12px;
+  }
+  .drug-profile-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+  }
+  .drug-profile h3 {
+    margin: 0;
+    color: var(--accent);
+    font-size: 13px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .drug-profile .drug-class {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-2);
+    font-size: 13px;
+  }
+  .profile-save-btn, .save-molecule-btn {
+    background: rgba(29,158,117,0.12);
+    border: 1px solid rgba(29,158,117,0.32);
+    border-radius: 7px;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 7px 10px;
+    white-space: nowrap;
+  }
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .profile-field {
+    background: rgba(29,158,117,0.055);
+    border: 1px solid rgba(29,158,117,0.14);
+    border-radius: 8px;
+    padding: 9px 10px;
+    min-height: 62px;
+  }
+  .profile-field b {
+    display: block;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .profile-field span {
+    color: var(--text-1);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .profile-note {
+    border-left: 2px solid var(--accent);
+    padding-left: 10px;
+    color: var(--text-2);
+  }
 
   .drug-strip {
     display: grid;
@@ -480,10 +640,15 @@
   }
   .settings-btn:hover { border-color: var(--border-hover); color: var(--accent); }
 
-  @media (max-width: 600px) {
+  @media (max-width: 860px) {
+    main { padding: 0 14px; }
+    .app-layout { grid-template-columns: 1fr; }
+    .side-panel { position: static; max-height: none; display: grid; grid-template-columns: 1fr; }
+    .chat-panel { min-height: auto; }
     .header-sub { display: none; }
     .capability-grid { grid-template-columns: 1fr 1fr; }
-    .bubble { max-width: 90%; }
+    .bubble { max-width: 92%; }
+    .profile-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -544,66 +709,85 @@
     <span class="chip" onclick="askChip('Give complete API drug details for Metformin including formula, IUPAC, CAS, mechanism, BCS, impurities, assay, storage, and regulatory specifications.')">Metformin API</span>
     <span class="chip" onclick="askChip('Give complete API drug details for Ibuprofen including formula, IUPAC, CAS, mechanism, BCS, impurities, assay, storage, and regulatory specifications.')">Ibuprofen API</span>
     <span class="chip" onclick="askChip('Give complete API drug details for Atorvastatin calcium including formula, IUPAC, CAS, mechanism, impurities, assay, storage, and regulatory specifications.')">Atorvastatin API</span>
-    <span class="chip" onclick="askChip('How does HPLC work in pharmaceutical API testing? Explain principle, column types, detectors and system suitability parameters.')">HPLC in API Testing</span>
-    <span class="chip" onclick="askChip('Explain GC headspace method for residual solvents testing per ICH Q3C. What are Class 1, 2, 3 solvent limits?')">GC Residual Solvents</span>
-    <span class="chip" onclick="askChip('What are ICH Q3A and Q3B impurity thresholds and reporting limits for API and drug products?')">ICH Q3A/B Limits</span>
-    <span class="chip" onclick="askChip('Explain ICH M7 genotoxic impurity assessment and TTC concept with acceptable daily intake limits')">Genotoxic Impurities</span>
-    <span class="chip" onclick="askChip('What is Drug Master File Type II? What sections are required for API filing with FDA?')">DMF Filing</span>
+    <span class="chip" onclick="askChip('Build a CTD Module 3.2.S checklist for an API DMF submission.')">CTD 3.2.S Checklist</span>
+    <span class="chip" onclick="askChip('Create an API impurity control strategy template with ICH Q3A, Q3C, Q3D, and M7 considerations.')">Impurity Strategy</span>
+    <span class="chip" onclick="askChip('Explain HPLC method validation parameters per ICH Q2(R2) for API assay and related substances testing.')">HPLC Validation</span>
   </div>
 
-  <!-- Messages -->
-  <div id="messages">
-    <div id="welcome">
-      <div class="welcome-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
-        </svg>
+  <div class="app-layout">
+    <aside class="side-panel">
+      <div class="panel-block">
+        <div class="panel-title">Saved Drugs <span class="panel-count" id="saved-count">0</span></div>
+        <div id="saved-drug-list" class="side-list"></div>
       </div>
-      <h1>Pharma API Expert Agent</h1>
-      <p>Your specialist in Active Pharmaceutical Ingredients — regulatory guidelines, analytical testing, synthesis, quality specifications, and compliance.</p>
-      <div class="drug-strip">
-        <div class="drug-card" onclick="askChip('Give complete API drug details for Amoxicillin trihydrate including specifications, assay, impurities, storage, and stability.')"><strong>Amoxicillin</strong><span>beta-lactam antibiotic</span></div>
-        <div class="drug-card" onclick="askChip('Give complete API drug details for Omeprazole including degradation risks, assay, impurities, storage, and stability.')"><strong>Omeprazole</strong><span>proton pump inhibitor</span></div>
-        <div class="drug-card" onclick="askChip('Give complete API drug details for Ciprofloxacin including assay, impurities, residual solvents, and regulatory specifications.')"><strong>Ciprofloxacin</strong><span>fluoroquinolone</span></div>
+      <div class="panel-block">
+        <div class="panel-title">Chat Memory <button class="mini-action" onclick="clearSavedChat()">Reset</button></div>
+        <div id="chat-memory-list" class="side-list"></div>
       </div>
-      <div class="capability-grid">
-        <div class="cap-card" onclick="askChip('Explain HPLC method validation parameters per ICH Q2R1 for API assay testing')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
-          <h3>Analytical Testing</h3>
-          <p>HPLC, GC, NMR, dissolution, Karl Fischer</p>
-        </div>
-        <div class="cap-card" onclick="askChip('What are ICH Q6A specifications for API — appearance, identification, assay, impurities and physicochemical tests?')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <h3>Quality Specs</h3>
-          <p>ICH Q6A, USP/EP/BP monographs</p>
-        </div>
-        <div class="cap-card" onclick="askChip('Explain ICH Q7 GMP requirements for API manufacturing — critical quality attributes and process controls')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-          <h3>Regulatory</h3>
-          <p>ICH, FDA, EMA, DMF, CTD filing</p>
-        </div>
-        <div class="cap-card" onclick="askChip('Explain API synthesis route selection criteria — atom economy, green chemistry, impurity control and scalability')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-          <h3>Process Chemistry</h3>
-          <p>Synthesis routes, scale-up, process validation</p>
+      <div class="panel-block">
+        <div class="panel-title">More Ideas</div>
+        <div class="side-list">
+          <div class="side-item" onclick="askChip('Create a batch release checklist for an API including CoA, OOS, deviations, stability, and GMP review.')"><strong>Batch release checklist</strong><span>CoA, OOS, deviations, GMP review</span></div>
+          <div class="side-item" onclick="askChip('Create an API stability protocol with ICH Q1A storage conditions, time points, tests, and acceptance criteria.')"><strong>Stability protocol</strong><span>ICH Q1A conditions and time points</span></div>
+          <div class="side-item" onclick="askChip('Create a cleaning validation MACO calculation template for API manufacturing equipment.')"><strong>Cleaning validation</strong><span>MACO, swab, rinse, 10 ppm criterion</span></div>
         </div>
       </div>
-    </div>
-  </div>
+    </aside>
 
-  <!-- Input -->
-  <div id="input-area">
-    <button class="icon-btn" onclick="clearChat()" title="Clear chat">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a1 1 0 011-1h2a1 1 0 011 1v2"/>
-      </svg>
-    </button>
-    <textarea id="user-input" placeholder="Ask about HPLC, GC, impurity limits, ICH guidelines, API synthesis..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-    <button class="icon-btn" id="send-btn" onclick="sendMessage()" title="Send">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-      </svg>
-    </button>
+    <section class="chat-panel">
+      <div id="messages">
+        <div id="welcome">
+          <div class="welcome-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
+            </svg>
+          </div>
+          <h1>Pharma API Expert Agent</h1>
+          <p>Search a drug, build an API profile, compare impurity risks, or prepare DMF-ready quality and regulatory notes.</p>
+          <div class="drug-strip">
+            <div class="drug-card" onclick="askChip('Give complete API drug details for Amoxicillin trihydrate including specifications, assay, impurities, storage, and stability.')"><strong>Amoxicillin</strong><span>beta-lactam antibiotic</span></div>
+            <div class="drug-card" onclick="askChip('Give complete API drug details for Omeprazole including degradation risks, assay, impurities, storage, and stability.')"><strong>Omeprazole</strong><span>proton pump inhibitor</span></div>
+            <div class="drug-card" onclick="askChip('Give complete API drug details for Ciprofloxacin including assay, impurities, residual solvents, and regulatory specifications.')"><strong>Ciprofloxacin</strong><span>fluoroquinolone</span></div>
+          </div>
+          <div class="capability-grid">
+            <div class="cap-card" onclick="askChip('Explain HPLC method validation parameters per ICH Q2(R2) for API assay testing')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+              <h3>Analytical Testing</h3>
+              <p>HPLC, GC, NMR, dissolution, Karl Fischer</p>
+            </div>
+            <div class="cap-card" onclick="askChip('What are ICH Q6A specifications for API including appearance, identification, assay, impurities and physicochemical tests?')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <h3>Quality Specs</h3>
+              <p>ICH Q6A, USP/EP/BP monographs</p>
+            </div>
+            <div class="cap-card" onclick="askChip('Explain ICH Q7 GMP requirements for API manufacturing including critical quality attributes and process controls')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              <h3>Regulatory</h3>
+              <p>ICH, FDA, EMA, DMF, CTD filing</p>
+            </div>
+            <div class="cap-card" onclick="askChip('Explain API synthesis route selection criteria including atom economy, green chemistry, impurity control and scalability')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              <h3>Process Chemistry</h3>
+              <p>Synthesis routes, scale-up, process validation</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="input-area">
+        <button class="icon-btn" onclick="clearChat()" title="Clear chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a1 1 0 011-1h2a1 1 0 011 1v2"/>
+          </svg>
+        </button>
+        <textarea id="user-input" placeholder="Ask about an API, QC method, impurity strategy, DMF, stability..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="icon-btn" id="send-btn" onclick="sendMessage()" title="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </section>
   </div>
 </main>
 
@@ -642,7 +826,7 @@ FORMAT:
 - Do not invent exact compendial limits. Mark monograph-dependent values as "per current USP/EP/IP monograph" when needed.
 - If DRUG_DETAIL_CONTEXT is supplied by the application, use it as the starting reference and expand it with pharma/regulatory detail.`;
 
-let history = [];
+let history = JSON.parse(localStorage.getItem('pharma_chat_history') || '[]');
 let isLoading = false;
 let apiKey = localStorage.getItem('pharma_gemini_key') || '';
 let savedMolecules = JSON.parse(localStorage.getItem('pharma_saved_molecules') || '[]');
@@ -776,28 +960,48 @@ function findDrugDetail(text) {
 
 function formatDrugDetailMarkdown(drug) {
   return [
-    '### API Quick Reference: ' + drug.displayName,
-    '',
-    '| Field | Detail |',
-    '|---|---|',
-    '| Molecular formula | **' + drug.formula + '** |',
-    '| Molecular weight | **' + drug.mw + '** |',
-    '| IUPAC name | ' + drug.iupac + ' |',
-    '| CAS number | **' + drug.cas + '** |',
-    '| Drug class | **' + drug.drugClass + '** |',
-    '| BCS / biopharmaceutics | ' + drug.bcs + ' |',
-    '| Storage sensitivity | ' + drug.storage + ' |',
-    '',
-    '**Mechanism:** ' + drug.mechanism,
-    '',
-    '**API properties:** ' + drug.properties,
-    '',
-    '**Typical assay:** ' + drug.assay,
-    '',
-    '**Key impurity watch-list:** ' + drug.impurities,
-    '',
-    '**Core QC controls:** ' + drug.controls
+    'DRUG_PROFILE::' + drug.displayName,
+    'Formula: ' + drug.formula,
+    'MW: ' + drug.mw,
+    'IUPAC: ' + drug.iupac,
+    'CAS: ' + drug.cas,
+    'Class: ' + drug.drugClass,
+    'BCS: ' + drug.bcs,
+    'Storage: ' + drug.storage,
+    'Mechanism: ' + drug.mechanism,
+    'Properties: ' + drug.properties,
+    'Assay: ' + drug.assay,
+    'Impurities: ' + drug.impurities,
+    'Controls: ' + drug.controls
   ].join('\n');
+}
+
+function renderDrugProfile(drug) {
+  return '<div class="drug-profile">' +
+    '<div class="drug-profile-head"><div><h3>API Profile: ' + escapeHtml(drug.displayName) + '</h3><span class="drug-class">' + escapeHtml(drug.drugClass) + '</span></div>' +
+    '<button class="profile-save-btn" onclick="saveKnownDrug(\'' + escapeAttr(drug.displayName) + '\')">Save Drug</button></div>' +
+    '<div class="profile-grid">' +
+      profileField('Formula', drug.formula) +
+      profileField('Molecular Weight', drug.mw) +
+      profileField('CAS Number', drug.cas) +
+      profileField('BCS / Biopharmaceutics', drug.bcs) +
+      profileField('IUPAC Name', drug.iupac) +
+      profileField('Storage', drug.storage) +
+    '</div>' +
+    '<div class="profile-note"><strong>Mechanism:</strong> ' + escapeHtml(drug.mechanism) + '</div>' +
+    '<div class="profile-note"><strong>Key impurity watch-list:</strong> ' + escapeHtml(drug.impurities) + '</div>' +
+    '<div class="profile-note"><strong>Core QC controls:</strong> ' + escapeHtml(drug.controls) + '</div>' +
+  '</div>';
+}
+
+function profileField(label, value) {
+  return '<div class="profile-field"><b>' + escapeHtml(label) + '</b><span>' + escapeHtml(value) + '</span></div>';
+}
+
+function drugFromProfileText(text) {
+  const first = text.split('\n')[0] || '';
+  if (!first.startsWith('DRUG_PROFILE::')) return null;
+  return DRUG_DETAILS.find(d => d.displayName === first.replace('DRUG_PROFILE::', '').trim()) || null;
 }
 
 function buildDrugAwarePrompt(userText, drug) {
@@ -805,7 +1009,70 @@ function buildDrugAwarePrompt(userText, drug) {
   return userText + '\n\nDRUG_DETAIL_CONTEXT:\n' + formatDrugDetailMarkdown(drug) + '\n\nUse this context, then expand with synthesis/process, quality specifications, impurity strategy, analytical methods, stability, storage, and CTD/DMF filing expectations.';
 }
 
-// ── Settings modal ──────────────────────────────────────────
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function escapeAttr(value) {
+  return String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+function escapeForJs(value) {
+  return String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+function saveChat() {
+  localStorage.setItem('pharma_chat_history', JSON.stringify(history.slice(-40)));
+  renderChatMemory();
+}
+
+function renderSavedDrugs() {
+  const list = document.getElementById('saved-drug-list');
+  const count = document.getElementById('saved-count');
+  if (count) count.textContent = String(savedMolecules.length);
+  if (!list) return;
+  if (!savedMolecules.length) {
+    list.innerHTML = '<div class="side-item"><strong>No saved drugs</strong><span>Open a drug profile and press Save Drug.</span></div>';
+    return;
+  }
+  list.innerHTML = savedMolecules.map((m, i) =>
+    '<div class="side-item" onclick="askChip(\'Tell me about ' + escapeForJs(m.name) + ' including API profile, impurities, specifications, analytical method and stability.\')">' +
+    '<strong>' + escapeHtml(m.name) + '</strong><span>' + escapeHtml(m.formula || '') + ' | ' + escapeHtml(m.cas || '-') + '</span>' +
+    '<button class="mini-action" style="margin-top:8px" onclick="event.stopPropagation();deleteMolecule(' + i + ')">Remove</button></div>'
+  ).join('');
+}
+
+function renderChatMemory() {
+  const list = document.getElementById('chat-memory-list');
+  if (!list) return;
+  const recent = history.filter(m => m.role === 'user').slice(-5).reverse();
+  if (!recent.length) {
+    list.innerHTML = '<div class="side-item"><strong>No saved chat yet</strong><span>Your conversation is stored locally after you ask.</span></div>';
+    return;
+  }
+  list.innerHTML = recent.map(m =>
+    '<div class="side-item" onclick="askChip(\'' + escapeForJs(m.content) + '\')"><strong>' + escapeHtml(m.content.slice(0, 46)) + (m.content.length > 46 ? '...' : '') + '</strong><span>Click to ask again</span></div>'
+  ).join('');
+}
+
+function restoreChat() {
+  if (!history.length) return false;
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = '';
+  history.slice(-20).forEach(m => addMsg(m.role, m.content, { persist: false }));
+  return true;
+}
+
+function clearSavedChat() {
+  history = [];
+  localStorage.removeItem('pharma_chat_history');
+  renderChatMemory();
+  clearChat(false);
+  showToast('Chat memory cleared');
+}
+
+// Settings modal ──────────────────────────────────────────
 function openSettings() {
   const inp = document.getElementById('key-input');
   if (apiKey) inp.value = apiKey;
@@ -840,34 +1107,47 @@ function closeMolLib() {
   document.getElementById('molLib-overlay').style.display = 'none';
   document.getElementById('molLib-modal').style.display = 'none';
 }
-function saveMolecule(name, formula, mw, cas) {
+function saveMolecule(name, formula, mw, cas, drugClass = '') {
+  if (!name) return;
   const exists = savedMolecules.find(m => m.name.toLowerCase() === name.toLowerCase());
-  if (exists) { showToast('Already saved!'); return; }
-  savedMolecules.push({ name, formula, mw, cas, savedAt: new Date().toLocaleDateString() });
-  localStorage.setItem('pharma_saved_molecules', JSON.stringify(savedMolecules));
-  showToast('✅ ' + name + ' saved!');
+  if (exists) { showToast('Already saved'); return; }
+  savedMolecules.push({ name, formula, mw, cas, drugClass, savedAt: new Date().toLocaleDateString() });
+  persistMolecules();
+  showToast(name + ' saved');
+  renderSavedDrugs();
   renderMolLib();
+}
+
+function saveKnownDrug(name) {
+  const drug = DRUG_DETAILS.find(d => d.displayName === name || d.names.includes(normalizeDrugName(name)));
+  if (!drug) return;
+  saveMolecule(drug.displayName, drug.formula, drug.mw, drug.cas, drug.drugClass);
 }
 function deleteMolecule(idx) {
   savedMolecules.splice(idx, 1);
-  localStorage.setItem('pharma_saved_molecules', JSON.stringify(savedMolecules));
+  persistMolecules();
+  renderSavedDrugs();
   renderMolLib();
+}
+
+function persistMolecules() {
+  localStorage.setItem('pharma_saved_molecules', JSON.stringify(savedMolecules));
 }
 function renderMolLib() {
   const container = document.getElementById('mol-list');
   if (!container) return;
   if (savedMolecules.length === 0) {
-    container.innerHTML = '<p style="color:#4d7a6a;font-size:13px;text-align:center;padding:20px 0;">No molecules saved yet.<br>Ask about any drug and save from chat!</p>';
+    container.innerHTML = '<p style="color:#4d7a6a;font-size:13px;text-align:center;padding:20px 0;">No drugs saved yet.<br>Open any API profile and press Save Drug.</p>';
     return;
   }
   container.innerHTML = savedMolecules.map((m, i) => `
-    <div style="background:rgba(29,158,117,0.06);border:1px solid rgba(29,158,117,0.18);border-radius:10px;padding:12px 14px;margin-bottom:10px;cursor:pointer;" onclick="askChip('Tell me about ${m.name} — synthesis, impurities, ICH specifications and analytical methods')">
+    <div style="background:rgba(29,158,117,0.06);border:1px solid rgba(29,158,117,0.18);border-radius:10px;padding:12px 14px;margin-bottom:10px;cursor:pointer;" onclick="askChip('Tell me about ${escapeForJs(m.name)} including synthesis, impurities, ICH specifications and analytical methods')">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <span style="font-size:14px;font-weight:500;color:#e8f5f0;">${m.name}</span>
-        <button onclick="event.stopPropagation();deleteMolecule(${i})" style="background:none;border:none;cursor:pointer;color:#4d7a6a;font-size:16px;padding:0 4px;">✕</button>
+        <span style="font-size:14px;font-weight:500;color:#e8f5f0;">${escapeHtml(m.name)}</span>
+        <button onclick="event.stopPropagation();deleteMolecule(${i})" style="background:none;border:none;cursor:pointer;color:#4d7a6a;font-size:16px;padding:0 4px;">x</button>
       </div>
-      <div style="font-size:12px;color:#8ab5a5;font-family:monospace;">${m.formula || ''} &nbsp;|&nbsp; MW: ${m.mw || '—'} &nbsp;|&nbsp; CAS: ${m.cas || '—'}</div>
-      <div style="font-size:11px;color:#4d7a6a;margin-top:4px;">Saved ${m.savedAt} · Click to ask</div>
+      <div style="font-size:12px;color:#8ab5a5;font-family:monospace;">${escapeHtml(m.formula || '')} | MW: ${escapeHtml(m.mw || '-')} | CAS: ${escapeHtml(m.cas || '-')}</div>
+      <div style="font-size:11px;color:#4d7a6a;margin-top:4px;">Saved ${escapeHtml(m.savedAt || '')}</div>
     </div>
   `).join('');
 }
@@ -894,7 +1174,7 @@ function hideWelcome() {
 }
 
 // ── Message rendering ────────────────────────────────────────
-function addMsg(role, text) {
+function addMsg(role, text, options = {}) {
   hideWelcome();
   const msgs = document.getElementById('messages');
   const div = document.createElement('div');
@@ -911,24 +1191,16 @@ function addMsg(role, text) {
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
   if (role === 'assistant') {
-    bubble.innerHTML = '<div class="tag">PHARMA API EXPERT</div>' + renderMarkdown(text);
-    // Save molecule button — extract drug name from response
-    const saveBtn = document.createElement('button');
-    saveBtn.style.cssText = 'margin-top:10px;background:rgba(29,158,117,0.12);border:1px solid rgba(29,158,117,0.3);border-radius:8px;padding:5px 14px;color:#1D9E75;font-size:12px;cursor:pointer;';
-    saveBtn.textContent = '🔖 Save Molecule';
-    saveBtn.onclick = () => {
-      const nameMatch = text.match(/\*\*([A-Za-z\s\-]+(?:HCl|HBr|Sodium|Potassium)?)\*\*/);
-      const formulaMatch = text.match(/Molecular formula \| \*\*([^*]+)\*\*/i) || text.match(/Formula:?\s*\*\*?([A-Za-z0-9.]+)\*\*?/i);
-      const mwMatch = text.match(/(\d+\.?\d*)\s*g\/mol/i);
-      const casMatch = text.match(/(\d{2,7}-\d{2}-\d)/);
-      const name = prompt('Molecule name to save:', nameMatch ? nameMatch[1] : '');
-      if (!name) return;
-      const formula = prompt('Molecular formula:', formulaMatch ? (formulaMatch[1] || formulaMatch[0]) : '');
-      const mw = prompt('Molecular weight (g/mol):', mwMatch ? mwMatch[1] : '');
-      const cas = prompt('CAS number:', casMatch ? casMatch[1] : '');
-      saveMolecule(name.trim(), formula, mw, cas);
-    };
-    bubble.appendChild(saveBtn);
+    const knownDrug = options.drug || drugFromProfileText(text);
+    bubble.innerHTML = '<div class="tag">PHARMA API EXPERT</div>' + (knownDrug ? renderDrugProfile(knownDrug) : renderMarkdown(text));
+    if (!knownDrug) {
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'save-molecule-btn';
+      saveBtn.style.marginTop = '10px';
+      saveBtn.textContent = 'Save Drug';
+      saveBtn.onclick = () => saveMoleculeFromText(text);
+      bubble.appendChild(saveBtn);
+    }
   } else {
     bubble.textContent = text;
   }
@@ -937,25 +1209,25 @@ function addMsg(role, text) {
   div.appendChild(bubble);
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
+  if (options.persist) saveChat();
 }
 
 function renderMarkdown(text) {
-  const escaped = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-
-  const withBlocks = escaped
+  const escaped = escapeHtml(text);
+  const withoutTableDividers = escaped.replace(/^\|\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|\s*$/gm, '');
+  const withBlocks = withoutTableDividers
     .replace(/\`\`\`([\s\S]*?)\`\`\`/g, '<pre>$1</pre>')
     .replace(/^\|(.+)\|$/gm, row => {
       const cells = row.split('|').slice(1, -1).map(cell => cell.trim());
-      if (cells.every(cell => /^-+$/.test(cell.replace(/\s/g, '')))) return '';
-      const tag = row.includes('---') ? 'th' : 'td';
-      return '<tr>' + cells.map(cell => '<' + tag + '>' + cell + '</' + tag + '>').join('') + '</tr>';
+      return '<tr>' + cells.map(cell => '<td>' + cell + '</td>').join('') + '</tr>';
     })
-    .replace(/(<tr>[\s\S]*?<\/tr>\n?)+/g, block => '<table>' + block + '</table>');
+    .replace(/(<tr>[\s\S]*?<\/tr>\n?)+/g, block => '<table>' + block.replace(/^<tr>/, '<tr class="table-head">') + '</table>');
 
   return withBlocks
+    .replace(/<tr class="table-head"><td>/g, '<tr><th>')
+    .replace(/<\/td><td>/g, '</td><td>')
+    .replace(/<\/td><\/tr>/g, '</td></tr>')
+    .replace(/<tr><th>([\s\S]*?)<\/td><\/tr>/g, row => row.replace(/<\/td><td>/g, '</th><th>').replace(/<\/td><\/tr>/g, '</th></tr>'))
     .replace(/\`([^\`]+)\`/g, '<code>$1</code>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
@@ -963,6 +1235,7 @@ function renderMarkdown(text) {
     .replace(/^## (.+)$/gm, '<h3>$1</h3>')
     .replace(/^\- (.+)$/gm, '<li>$1</li>')
     .replace(/(<li>.*<\/li>\n?)+/g, s => '<ul>' + s + '</ul>')
+    .replace(/\n{3,}/g, '\n\n')
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br>');
 }
@@ -998,16 +1271,24 @@ async function sendMessage() {
   input.value = '';
   input.style.height = 'auto';
   addMsg('user', text);
-  if (drugDetail) addMsg('assistant', formatDrugDetailMarkdown(drugDetail));
   history.push({ role: 'user', content: text });
-  if (history.length > 20) history = history.slice(-20);
+  if (drugDetail) {
+    const profileText = formatDrugDetailMarkdown(drugDetail);
+    history.push({ role: 'assistant', content: profileText });
+    addMsg('assistant', profileText, { drug: drugDetail });
+    saveChat();
+  } else {
+    saveChat();
+  }
+  if (history.length > 40) history = history.slice(-40);
 
   isLoading = true;
   document.getElementById('send-btn').disabled = true;
   showTyping();
 
   try {
-    const geminiHistory = history.slice(0, -1).map(m => ({
+    const previousMessages = history.slice(0, drugDetail ? -2 : -1);
+    const geminiHistory = previousMessages.map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }]
     }));
@@ -1021,7 +1302,7 @@ async function sendMessage() {
           system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents: [
             ...geminiHistory,
-            { role: 'user', parts: [{ text: buildDrugAwarePrompt(history[history.length - 1].content, drugDetail) }] }
+            { role: 'user', parts: [{ text: buildDrugAwarePrompt(text, drugDetail) }] }
           ],
           generationConfig: { maxOutputTokens: 1500, temperature: 0.3 }
         })
@@ -1038,8 +1319,9 @@ Please check your Gemini API key.`);
     } else {
       const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
       history.push({ role: 'assistant', content: reply });
-      if (history.length > 20) history = history.slice(-20);
+      if (history.length > 40) history = history.slice(-40);
       addMsg('assistant', reply);
+      saveChat();
     }
   } catch (err) {
     removeTyping();
@@ -1057,13 +1339,38 @@ function askChip(q) {
   sendMessage();
 }
 
-function clearChat() {
-  history = [];
+function clearChat(clearMemory = true) {
+  if (clearMemory) {
+    history = [];
+    localStorage.removeItem('pharma_chat_history');
+    renderChatMemory();
+  }
   const msgs = document.getElementById('messages');
-  msgs.innerHTML = '<p style="text-align:center;color:#4d7a6a;font-size:14px;padding:40px 0;">Chat cleared. Ready for new questions!</p>';
+  msgs.innerHTML = '<p style="text-align:center;color:#4d7a6a;font-size:14px;padding:40px 0;">Chat cleared. Ready for new API questions.</p>';
+}
+
+function saveMoleculeFromText(text) {
+  const drug = findDrugDetail(text);
+  if (drug) {
+    saveKnownDrug(drug.displayName);
+    return;
+  }
+  const nameMatch = text.match(/(?:API Profile:|API Quick Reference:?|^###\s*)([^\n]+)/i) || text.match(/\*\*([A-Za-z][A-Za-z\s\-]+)\*\*/);
+  const formulaMatch = text.match(/(?:Molecular formula|Formula)\s*[:|]\s*\*\*?([A-Za-z0-9.]+)\*\*?/i);
+  const mwMatch = text.match(/(\d+\.?\d*)\s*g\/mol/i);
+  const casMatch = text.match(/(\d{2,7}-\d{2}-\d)/);
+  const name = prompt('Drug/API name to save:', nameMatch ? nameMatch[1].replace(/\|.*/, '').trim() : '');
+  if (!name) return;
+  const formula = prompt('Molecular formula:', formulaMatch ? formulaMatch[1] : '');
+  const mw = prompt('Molecular weight (g/mol):', mwMatch ? mwMatch[1] : '');
+  const cas = prompt('CAS number:', casMatch ? casMatch[1] : '');
+  saveMolecule(name.trim(), formula, mw, cas);
 }
 
 function init() {
+  renderSavedDrugs();
+  renderChatMemory();
+  restoreChat();
   if (!apiKey) setTimeout(openSettings, 600);
 }
 
