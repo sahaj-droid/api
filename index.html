@@ -289,6 +289,63 @@
   .bubble td { padding:6px 10px; border:1px solid var(--border); color:var(--text-2); }
   .bubble tr:hover td { background:rgba(29,158,117,0.04); }
 
+  .drug-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: 8px;
+    padding: 0 0 12px;
+  }
+  .drug-card {
+    background: rgba(29,158,117,0.07);
+    border: 1px solid rgba(29,158,117,0.18);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .drug-card:hover {
+    border-color: var(--border-hover);
+    background: rgba(29,158,117,0.12);
+  }
+  .drug-card strong {
+    display: block;
+    font-size: 13px;
+    color: var(--text-1);
+    font-weight: 500;
+  }
+  .drug-card span {
+    display: block;
+    margin-top: 2px;
+    color: var(--text-3);
+    font-size: 11px;
+    font-family: var(--font-mono);
+  }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
+    margin: 8px 0 10px;
+  }
+  .detail-grid div {
+    background: rgba(29,158,117,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .detail-grid b {
+    display: block;
+    color: var(--accent);
+    font-size: 10px;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 2px;
+  }
+  .detail-grid span {
+    color: var(--text-1);
+    font-size: 13px;
+  }
+
   /* === TYPING === */
   .typing-wrap { display:flex; gap:12px; align-items:flex-start; }
   .typing-bubble {
@@ -447,6 +504,9 @@
       <div class="status-dot"></div>
       <span>Ready</span>
     </div>
+    <button class="settings-btn" onclick="openMolLib()" title="Saved Molecules" style="margin-left:0;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </button>
     <button class="settings-btn" onclick="openSettings()" title="Settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
@@ -467,16 +527,28 @@
   <div id="key-status" style="margin-top:8px;font-size:12px;text-align:center;"></div>
 </div>
 
+<!-- Molecule Library Modal -->
+<div id="molLib-overlay" onclick="closeMolLib()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;"></div>
+<div id="molLib-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:201;background:#111916;border:1px solid rgba(29,158,117,0.3);border-radius:16px;padding:28px;width:90%;max-width:460px;max-height:80vh;overflow-y:auto;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <h2 style="font-size:16px;font-weight:500;color:#e8f5f0;">🔖 Saved Molecules</h2>
+    <button onclick="closeMolLib()" style="background:none;border:none;cursor:pointer;color:#4d7a6a;font-size:20px;line-height:1;">✕</button>
+  </div>
+  <div id="mol-list"></div>
+</div>
+
 <main>
   <!-- Quick chips -->
   <div id="chips-wrap">
-    <span class="chip" onclick="askChip('How does HPLC work in pharmaceutical API testing? Explain principle, column types, detectors and system suitability parameters.')">⚗️ HPLC in API Testing</span>
-    <span class="chip" onclick="askChip('Explain GC headspace method for residual solvents testing per ICH Q3C. What are Class 1, 2, 3 solvent limits?')">🧪 GC Residual Solvents</span>
-    <span class="chip" onclick="askChip('What are ICH Q3A and Q3B impurity thresholds and reporting limits for API and drug products?')">📋 ICH Q3A/B Limits</span>
-    <span class="chip" onclick="askChip('Explain ICH M7 genotoxic impurity assessment and TTC concept with acceptable daily intake limits')">⚠️ Genotoxic Impurities</span>
-    <span class="chip" onclick="askChip('What is polymorphism in API? How does it affect bioavailability and what analytical methods detect it?')">🔬 Polymorphism</span>
-    <span class="chip" onclick="askChip('Explain ICH Q1A stability study design for API — storage conditions, time points, and degradation testing')">📦 Stability Studies</span>
-    <span class="chip" onclick="askChip('What is Drug Master File (DMF) Type II? What sections are required for API filing with FDA?')">📁 DMF Filing</span>
+    <span class="chip" onclick="askChip('Give complete API drug details for Paracetamol including formula, IUPAC, CAS, mechanism, BCS, impurities, assay, storage, and regulatory specifications.')">Paracetamol API</span>
+    <span class="chip" onclick="askChip('Give complete API drug details for Metformin including formula, IUPAC, CAS, mechanism, BCS, impurities, assay, storage, and regulatory specifications.')">Metformin API</span>
+    <span class="chip" onclick="askChip('Give complete API drug details for Ibuprofen including formula, IUPAC, CAS, mechanism, BCS, impurities, assay, storage, and regulatory specifications.')">Ibuprofen API</span>
+    <span class="chip" onclick="askChip('Give complete API drug details for Atorvastatin calcium including formula, IUPAC, CAS, mechanism, impurities, assay, storage, and regulatory specifications.')">Atorvastatin API</span>
+    <span class="chip" onclick="askChip('How does HPLC work in pharmaceutical API testing? Explain principle, column types, detectors and system suitability parameters.')">HPLC in API Testing</span>
+    <span class="chip" onclick="askChip('Explain GC headspace method for residual solvents testing per ICH Q3C. What are Class 1, 2, 3 solvent limits?')">GC Residual Solvents</span>
+    <span class="chip" onclick="askChip('What are ICH Q3A and Q3B impurity thresholds and reporting limits for API and drug products?')">ICH Q3A/B Limits</span>
+    <span class="chip" onclick="askChip('Explain ICH M7 genotoxic impurity assessment and TTC concept with acceptable daily intake limits')">Genotoxic Impurities</span>
+    <span class="chip" onclick="askChip('What is Drug Master File Type II? What sections are required for API filing with FDA?')">DMF Filing</span>
   </div>
 
   <!-- Messages -->
@@ -489,6 +561,11 @@
       </div>
       <h1>Pharma API Expert Agent</h1>
       <p>Your specialist in Active Pharmaceutical Ingredients — regulatory guidelines, analytical testing, synthesis, quality specifications, and compliance.</p>
+      <div class="drug-strip">
+        <div class="drug-card" onclick="askChip('Give complete API drug details for Amoxicillin trihydrate including specifications, assay, impurities, storage, and stability.')"><strong>Amoxicillin</strong><span>beta-lactam antibiotic</span></div>
+        <div class="drug-card" onclick="askChip('Give complete API drug details for Omeprazole including degradation risks, assay, impurities, storage, and stability.')"><strong>Omeprazole</strong><span>proton pump inhibitor</span></div>
+        <div class="drug-card" onclick="askChip('Give complete API drug details for Ciprofloxacin including assay, impurities, residual solvents, and regulatory specifications.')"><strong>Ciprofloxacin</strong><span>fluoroquinolone</span></div>
+      </div>
       <div class="capability-grid">
         <div class="cap-card" onclick="askChip('Explain HPLC method validation parameters per ICH Q2R1 for API assay testing')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
@@ -531,68 +608,204 @@
 </main>
 
 <script>
-const SYSTEM_PROMPT = `You are a highly specialized expert in Pharmaceuticals API (Active Pharmaceutical Ingredients) with 20+ years of experience in pharmaceutical chemistry, regulatory affairs, analytical chemistry, and quality control.
+const SYSTEM_PROMPT = `You are a highly specialized expert in pharmaceutical APIs (Active Pharmaceutical Ingredients) with 20+ years of experience in pharmaceutical chemistry, regulatory affairs, analytical chemistry, GMP manufacturing, and quality control.
 
-Your deep expertise covers:
+When the user asks about a drug/API, produce a practical technical monograph style answer.
+
+DRUG/API DETAIL STRUCTURE:
+- Start with "### API Quick Reference".
+- Include molecular formula, molecular weight, IUPAC name, CAS number, drug class, pharmacological action, BCS class when known, dose form relevance, pKa/logP/solubility when relevant, and storage sensitivity.
+- Then include "### Pharma Development Notes" covering route of synthesis or key intermediates at a high level, polymorphism/salt/hydrate risk, particle size, hygroscopicity, compatibility, and stability/degradation risks.
+- Include "### Quality Control and Specifications" with identity tests, assay method, related substances, residual solvents, water content/LOD, sulfated ash/residue, heavy metals/ICH Q3D, microbial limits where relevant, and packaging/storage.
+- Include "### Impurities and Risk Controls" with process impurities, degradation products, genotoxic/nitrosamine risk where relevant, elemental impurities, residual solvents, and control strategy.
+- Include "### Regulatory Filing" with CTD Module 3.2.S expectations: S.1 general information, S.2 manufacture, S.3 characterization, S.4 control of API, S.5 reference standards, S.6 container closure, S.7 stability.
 
 ANALYTICAL TESTING:
-- HPLC (RP-HPLC, HILIC, ion-exchange, SEC) — principle, column chemistry, mobile phases, UV/PDA/MS/RI detectors, system suitability (USP tailing factor, theoretical plates, resolution, %RSD), gradient methods
-- GC — headspace, direct injection, GC-FID, GC-MS, residual solvents per ICH Q3C (Class 1/2/3 limits in ppm)
-- NMR, IR, Raman for structural characterization and polymorph identification
-- Dissolution testing — USP apparatus 1/2, f2 similarity factor, sink conditions
-- Karl Fischer titration for water content
-- Particle size — laser diffraction, microscopy, sieve analysis
-- ICH Q2R1 method validation — accuracy, precision, specificity, LOD/LOQ, linearity, range, robustness
+- HPLC: RP-HPLC, HILIC, ion-exchange, SEC; column chemistry, mobile phase, UV/PDA/MS/RI detectors, system suitability including tailing factor, theoretical plates, resolution, and %RSD.
+- GC: headspace and direct injection, GC-FID, GC-MS, residual solvents per ICH Q3C.
+- NMR, IR, Raman, XRPD, DSC, TGA, KF water, particle size, dissolution, and method validation per ICH Q2(R2)/Q14 where useful.
 
-REGULATORY & QUALITY:
-- ICH guidelines: Q1A (stability), Q2R1 (validation), Q3A/B/C/D (impurities), Q6A/B (specifications), Q7 (GMP for API), Q8/Q9/Q10/Q11 (pharmaceutical development), M7 (genotoxic impurities), S9
-- FDA, EMA, TGA, CDSCO requirements
-- Pharmacopoeial monographs: USP, EP, BP, IP, JP — specifications, tests, acceptance criteria
-- Drug Master File (DMF) Type II — CTD Module 3 structure, sections 3.2.S.1-3.2.S.7
-- Starting materials assessment, critical quality attributes (CQAs), control strategy
+REGULATORY AND QUALITY:
+- ICH Q1A, Q2(R2), Q3A/B/C/D, Q6A/B, Q7, Q8/Q9/Q10/Q11, Q14, M7, FDA/EMA expectations, USP/EP/BP/IP/JP monographs, DMF/ASMF/CEP expectations.
+- Distinguish API controls from finished drug product controls.
+- Give numbers and acceptance criteria when they are well established. If a limit depends on dose/route/monograph, say that clearly.
 
-PROCESS & CHEMISTRY:
-- API synthesis routes, key reagents, reaction mechanisms, byproduct formation
-- Salt selection, polymorph screening (XRPD, DSC, TGA)
-- Scale-up considerations, process validation (prospective/concurrent/retrospective)
-- Cleaning validation limits (Swab/Rinse, MACO calculation, 10 ppm criterion)
-- Impurity profiling — process impurities, degradation products, genotoxic impurities, elemental impurities (ICH Q3D)
+IMPURITY LIMITS TO USE CAREFULLY:
+- ICH M7 TTC: 1.5 ug/day acceptable intake for many mutagenic impurities, unless compound-specific limits apply.
+- ICH Q3C examples: benzene 2 ppm, carbon tetrachloride 4 ppm, 1,2-dichloroethane 5 ppm, acetonitrile 410 ppm, dichloromethane 600 ppm, tetrahydrofuran 720 ppm, methanol 3000 ppm, toluene 890 ppm.
+- ICH Q3D elemental impurity limits are route-specific PDE values and should not be treated as one fixed universal ppm value.
 
-IMPURITY LIMITS (cite exactly):
-- ICH Q3A: Reporting threshold 0.05% or 1.0mg TDI; Identification 0.10% or 2mg TDI; Qualification 0.15% or 1mg TDI
-- ICH M7 TTC: 1.5 μg/day acceptable intake for genotoxic impurities
-- ICH Q3C Class 1 solvents: Benzene 2ppm, CCl4 4ppm, 1,2-DCE 5ppm
-- ICH Q3C Class 2: Acetonitrile 410ppm, DCM 600ppm, THF 720ppm, Methanol 3000ppm, Toluene 890ppm
-- ICH Q3D elemental impurities: Oral route limits in μg/day
-
-MOLECULE / DRUG IDENTIFICATION:
-- Whenever a molecule, drug name, or API name is mentioned (e.g. Paracetamol, Metformin, Ibuprofen), ALWAYS show a quick-reference box at the top with:
-  • Molecular Formula (e.g. C8H9NO2)
-  • Molecular Weight (e.g. 151.16 g/mol)
-  • IUPAC Name
-  • CAS Number
-  • Drug class / therapeutic category
-- Then continue with the main pharma/regulatory answer below it.
-
-FORMAT YOUR RESPONSE:
-- Use **bold** for key terms, limits, and guideline names
-- Use ### for section headers when explaining multi-part topics
-- Provide specific numbers, limits, and acceptance criteria always
-- Use tables for comparing specifications or limits where helpful
-- Be technically precise and complete`;
+FORMAT:
+- Use **bold** for key terms, numbers, limits, and guideline names.
+- Use concise tables for drug identity, QC tests, impurities, and regulatory sections.
+- Be technically precise, practical, and complete.
+- Do not invent exact compendial limits. Mark monograph-dependent values as "per current USP/EP/IP monograph" when needed.
+- If DRUG_DETAIL_CONTEXT is supplied by the application, use it as the starting reference and expand it with pharma/regulatory detail.`;
 
 let history = [];
 let isLoading = false;
 let apiKey = localStorage.getItem('pharma_gemini_key') || '';
+let savedMolecules = JSON.parse(localStorage.getItem('pharma_saved_molecules') || '[]');
 
-function init() {
-  if (apiKey) {
-    document.getElementById('key-banner').classList.add('hidden');
-  } else {
-    document.getElementById('key-banner').style.display = 'flex';
+const DRUG_DETAILS = [
+  {
+    names: ['paracetamol', 'acetaminophen', 'apap'],
+    displayName: 'Paracetamol (Acetaminophen)',
+    formula: 'C8H9NO2',
+    mw: '151.16 g/mol',
+    iupac: 'N-(4-hydroxyphenyl)acetamide',
+    cas: '103-90-2',
+    drugClass: 'Analgesic and antipyretic',
+    bcs: 'BCS Class III is commonly cited; classification can vary by source and dose context',
+    mechanism: 'Central COX pathway modulation with analgesic and antipyretic effect',
+    properties: 'White crystalline powder; sparingly soluble in water; phenolic OH; monitor particle size for formulation consistency',
+    storage: 'Store in well-closed containers, protected from moisture and excessive heat',
+    assay: 'Typically HPLC or UV assay per validated/compendial method',
+    impurities: 'p-aminophenol, related acetanilide derivatives, process impurities, oxidative degradation products',
+    controls: 'Identification by IR/UV/HPLC retention; assay, related substances, loss on drying/water, residue on ignition/sulfated ash, heavy metals/ICH Q3D as applicable'
+  },
+  {
+    names: ['metformin', 'metformin hydrochloride', 'metformin hcl'],
+    displayName: 'Metformin Hydrochloride',
+    formula: 'C4H11N5.HCl',
+    mw: '165.62 g/mol',
+    iupac: '1,1-dimethylbiguanide hydrochloride',
+    cas: '1115-70-4',
+    drugClass: 'Biguanide antidiabetic',
+    bcs: 'High solubility; permeability is low to moderate depending on classification source',
+    mechanism: 'Reduces hepatic glucose production and improves insulin sensitivity, mainly through AMPK-linked pathways',
+    properties: 'Highly water soluble, basic biguanide salt; hygroscopicity and residual dimethylamine risk should be controlled',
+    storage: 'Store tightly closed and protected from moisture',
+    assay: 'HPLC, ion-pair HPLC, or titrimetric/compendial assay depending on monograph',
+    impurities: 'Cyanoguanidine, dimethylamine-related impurities, melamine risk controls, nitrosamine risk assessment for NDMA',
+    controls: 'Assay, related substances, residual solvents, water, chloride identity, nitrosamine risk controls, elemental impurities'
+  },
+  {
+    names: ['ibuprofen'],
+    displayName: 'Ibuprofen',
+    formula: 'C13H18O2',
+    mw: '206.28 g/mol',
+    iupac: '2-[4-(2-methylpropyl)phenyl]propanoic acid',
+    cas: '15687-27-1',
+    drugClass: 'NSAID analgesic and anti-inflammatory',
+    bcs: 'BCS Class II: low solubility and high permeability',
+    mechanism: 'Non-selective COX-1/COX-2 inhibition, reducing prostaglandin synthesis',
+    properties: 'Weak acid, practically insoluble in water, chiral API often used as racemate; particle size affects dissolution',
+    storage: 'Store in well-closed containers away from excessive heat',
+    assay: 'HPLC or acid-base titration per compendial/validated method',
+    impurities: 'Related arylpropionic acid impurities, isobutylacetophenone-related impurities, oxidation/decarboxylation products',
+    controls: 'Assay, related substances, residual solvents, specific optical rotation/chiral purity when applicable, particle size for formulation'
+  },
+  {
+    names: ['atorvastatin', 'atorvastatin calcium'],
+    displayName: 'Atorvastatin Calcium',
+    formula: 'C66H68CaF2N4O10',
+    mw: '1155.34 g/mol',
+    iupac: 'Calcium bis[(3R,5R)-7-[2-(4-fluorophenyl)-3-phenyl-4-(phenylcarbamoyl)-5-propan-2-ylpyrrol-1-yl]-3,5-dihydroxyheptanoate]',
+    cas: '134523-03-8',
+    drugClass: 'HMG-CoA reductase inhibitor statin',
+    bcs: 'Low aqueous solubility; dissolution and solid-state form are critical',
+    mechanism: 'Competitive inhibition of HMG-CoA reductase, lowering cholesterol biosynthesis',
+    properties: 'Amorphous/crystalline form and calcium salt stoichiometry matter; sensitive to acid/lactonization and oxidation',
+    storage: 'Protect from moisture, light, and elevated temperature; use tight container',
+    assay: 'Stability-indicating RP-HPLC with impurity/degradation separation',
+    impurities: 'Atorvastatin lactone, desfluoro analogs, oxidative impurities, diastereomeric/chiral impurities',
+    controls: 'Assay, related substances, water, residual solvents, amorphous/crystalline form, elemental impurities, stability-indicating method'
+  },
+  {
+    names: ['amoxicillin', 'amoxicillin trihydrate'],
+    displayName: 'Amoxicillin Trihydrate',
+    formula: 'C16H19N3O5S.3H2O',
+    mw: '419.45 g/mol',
+    iupac: '(2S,5R,6R)-6-[[(2R)-2-amino-2-(4-hydroxyphenyl)acetyl]amino]-3,3-dimethyl-7-oxo-4-thia-1-azabicyclo[3.2.0]heptane-2-carboxylic acid trihydrate',
+    cas: '61336-70-7',
+    drugClass: 'Beta-lactam aminopenicillin antibiotic',
+    bcs: 'High solubility relative to dose; permeability/classification can vary',
+    mechanism: 'Inhibits bacterial cell-wall synthesis by binding penicillin-binding proteins',
+    properties: 'Beta-lactam ring is hydrolysis-sensitive; trihydrate water content and potency are critical',
+    storage: 'Store protected from moisture and heat; beta-lactams need careful contamination control',
+    assay: 'Stability-indicating HPLC/potency method per monograph',
+    impurities: 'Penicilloic acids, diketopiperazine degradation products, related beta-lactam impurities',
+    controls: 'Assay/potency, water, related substances, pH, crystallinity, residual solvents, microbial/bioburden controls as applicable'
+  },
+  {
+    names: ['omeprazole'],
+    displayName: 'Omeprazole',
+    formula: 'C17H19N3O3S',
+    mw: '345.42 g/mol',
+    iupac: '5-methoxy-2-[(4-methoxy-3,5-dimethylpyridin-2-yl)methylsulfinyl]-1H-benzimidazole',
+    cas: '73590-58-6',
+    drugClass: 'Proton pump inhibitor',
+    bcs: 'Low aqueous stability in acid; enteric protection is formulation-critical',
+    mechanism: 'Irreversible inhibition of gastric H+/K+-ATPase after activation in acidic canaliculi',
+    properties: 'Acid labile sulfoxide; sensitive to moisture, heat, light, and acidic excipients',
+    storage: 'Protect from light, moisture, and acidic conditions; tight container',
+    assay: 'Stability-indicating RP-HPLC with degradation product control',
+    impurities: 'Sulfone, sulfide, benzimidazole/pyridine related substances, acid degradation products',
+    controls: 'Assay, related substances, water, residual solvents, polymorphic/solid-state form where relevant, packaging compatibility'
+  },
+  {
+    names: ['ciprofloxacin', 'ciprofloxacin hydrochloride', 'ciprofloxacin hcl'],
+    displayName: 'Ciprofloxacin Hydrochloride',
+    formula: 'C17H18FN3O3.HCl.H2O',
+    mw: '385.82 g/mol',
+    iupac: '1-cyclopropyl-6-fluoro-4-oxo-7-piperazin-1-ylquinoline-3-carboxylic acid hydrochloride monohydrate',
+    cas: '86393-32-0',
+    drugClass: 'Fluoroquinolone antibacterial',
+    bcs: 'Solubility is pH-dependent; chelation risk with multivalent cations',
+    mechanism: 'Inhibits bacterial DNA gyrase and topoisomerase IV',
+    properties: 'Zwitterionic/ionizable quinolone; light sensitivity and metal chelation are key controls',
+    storage: 'Store protected from light and moisture',
+    assay: 'HPLC assay and related substances method per monograph/validated method',
+    impurities: 'Ethylene diamine/piperazine related impurities, fluoroquinolone process impurities, photodegradation products',
+    controls: 'Assay, related substances, water, residual solvents, chloride identity, elemental impurities, photostability'
   }
+];
+
+function normalizeDrugName(value) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
+function findDrugDetail(text) {
+  const normalized = normalizeDrugName(text);
+  return DRUG_DETAILS.find(drug => drug.names.some(name => {
+    const needle = normalizeDrugName(name);
+    return normalized === needle || normalized.includes(needle);
+  }));
+}
+
+function formatDrugDetailMarkdown(drug) {
+  return [
+    '### API Quick Reference: ' + drug.displayName,
+    '',
+    '| Field | Detail |',
+    '|---|---|',
+    '| Molecular formula | **' + drug.formula + '** |',
+    '| Molecular weight | **' + drug.mw + '** |',
+    '| IUPAC name | ' + drug.iupac + ' |',
+    '| CAS number | **' + drug.cas + '** |',
+    '| Drug class | **' + drug.drugClass + '** |',
+    '| BCS / biopharmaceutics | ' + drug.bcs + ' |',
+    '| Storage sensitivity | ' + drug.storage + ' |',
+    '',
+    '**Mechanism:** ' + drug.mechanism,
+    '',
+    '**API properties:** ' + drug.properties,
+    '',
+    '**Typical assay:** ' + drug.assay,
+    '',
+    '**Key impurity watch-list:** ' + drug.impurities,
+    '',
+    '**Core QC controls:** ' + drug.controls
+  ].join('\n');
+}
+
+function buildDrugAwarePrompt(userText, drug) {
+  if (!drug) return userText;
+  return userText + '\n\nDRUG_DETAIL_CONTEXT:\n' + formatDrugDetailMarkdown(drug) + '\n\nUse this context, then expand with synthesis/process, quality specifications, impurity strategy, analytical methods, stability, storage, and CTD/DMF filing expectations.';
+}
+
+// ── Settings modal ──────────────────────────────────────────
 function openSettings() {
   const inp = document.getElementById('key-input');
   if (apiKey) inp.value = apiKey;
@@ -602,18 +815,13 @@ function openSettings() {
   document.getElementById('settings-overlay').style.display = 'block';
   document.getElementById('settings-modal').style.display = 'block';
 }
-
 function closeSettings() {
   document.getElementById('settings-overlay').style.display = 'none';
   document.getElementById('settings-modal').style.display = 'none';
 }
-
 function saveKey() {
   const val = document.getElementById('key-input').value.trim();
-  if (!val) {
-    alert('Please enter your Gemini API key.');
-    return;
-  }
+  if (!val) { alert('Please enter your Gemini API key.'); return; }
   apiKey = val;
   localStorage.setItem('pharma_gemini_key', apiKey);
   const status = document.getElementById('key-status');
@@ -622,24 +830,70 @@ function saveKey() {
   setTimeout(closeSettings, 800);
 }
 
-function init() {
-  if (!apiKey) {
-    setTimeout(openSettings, 600);
+// ── Molecule library ────────────────────────────────────────
+function openMolLib() {
+  renderMolLib();
+  document.getElementById('molLib-overlay').style.display = 'block';
+  document.getElementById('molLib-modal').style.display = 'block';
+}
+function closeMolLib() {
+  document.getElementById('molLib-overlay').style.display = 'none';
+  document.getElementById('molLib-modal').style.display = 'none';
+}
+function saveMolecule(name, formula, mw, cas) {
+  const exists = savedMolecules.find(m => m.name.toLowerCase() === name.toLowerCase());
+  if (exists) { showToast('Already saved!'); return; }
+  savedMolecules.push({ name, formula, mw, cas, savedAt: new Date().toLocaleDateString() });
+  localStorage.setItem('pharma_saved_molecules', JSON.stringify(savedMolecules));
+  showToast('✅ ' + name + ' saved!');
+  renderMolLib();
+}
+function deleteMolecule(idx) {
+  savedMolecules.splice(idx, 1);
+  localStorage.setItem('pharma_saved_molecules', JSON.stringify(savedMolecules));
+  renderMolLib();
+}
+function renderMolLib() {
+  const container = document.getElementById('mol-list');
+  if (!container) return;
+  if (savedMolecules.length === 0) {
+    container.innerHTML = '<p style="color:#4d7a6a;font-size:13px;text-align:center;padding:20px 0;">No molecules saved yet.<br>Ask about any drug and save from chat!</p>';
+    return;
   }
-}(el) {
+  container.innerHTML = savedMolecules.map((m, i) => `
+    <div style="background:rgba(29,158,117,0.06);border:1px solid rgba(29,158,117,0.18);border-radius:10px;padding:12px 14px;margin-bottom:10px;cursor:pointer;" onclick="askChip('Tell me about ${m.name} — synthesis, impurities, ICH specifications and analytical methods')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-size:14px;font-weight:500;color:#e8f5f0;">${m.name}</span>
+        <button onclick="event.stopPropagation();deleteMolecule(${i})" style="background:none;border:none;cursor:pointer;color:#4d7a6a;font-size:16px;padding:0 4px;">✕</button>
+      </div>
+      <div style="font-size:12px;color:#8ab5a5;font-family:monospace;">${m.formula || ''} &nbsp;|&nbsp; MW: ${m.mw || '—'} &nbsp;|&nbsp; CAS: ${m.cas || '—'}</div>
+      <div style="font-size:11px;color:#4d7a6a;margin-top:4px;">Saved ${m.savedAt} · Click to ask</div>
+    </div>
+  `).join('');
+}
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0F6E56;color:#e8f5f0;padding:8px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:1;transition:opacity 0.4s;';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2000);
+}
+
+// ── Input helpers ───────────────────────────────────────────
+function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 140) + 'px';
 }
-
 function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
-
 function hideWelcome() {
   const w = document.getElementById('welcome');
   if (w) w.remove();
 }
 
+// ── Message rendering ────────────────────────────────────────
 function addMsg(role, text) {
   hideWelcome();
   const msgs = document.getElementById('messages');
@@ -656,9 +910,25 @@ function addMsg(role, text) {
 
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
-
   if (role === 'assistant') {
     bubble.innerHTML = '<div class="tag">PHARMA API EXPERT</div>' + renderMarkdown(text);
+    // Save molecule button — extract drug name from response
+    const saveBtn = document.createElement('button');
+    saveBtn.style.cssText = 'margin-top:10px;background:rgba(29,158,117,0.12);border:1px solid rgba(29,158,117,0.3);border-radius:8px;padding:5px 14px;color:#1D9E75;font-size:12px;cursor:pointer;';
+    saveBtn.textContent = '🔖 Save Molecule';
+    saveBtn.onclick = () => {
+      const nameMatch = text.match(/\*\*([A-Za-z\s\-]+(?:HCl|HBr|Sodium|Potassium)?)\*\*/);
+      const formulaMatch = text.match(/Molecular formula \| \*\*([^*]+)\*\*/i) || text.match(/Formula:?\s*\*\*?([A-Za-z0-9.]+)\*\*?/i);
+      const mwMatch = text.match(/(\d+\.?\d*)\s*g\/mol/i);
+      const casMatch = text.match(/(\d{2,7}-\d{2}-\d)/);
+      const name = prompt('Molecule name to save:', nameMatch ? nameMatch[1] : '');
+      if (!name) return;
+      const formula = prompt('Molecular formula:', formulaMatch ? (formulaMatch[1] || formulaMatch[0]) : '');
+      const mw = prompt('Molecular weight (g/mol):', mwMatch ? mwMatch[1] : '');
+      const cas = prompt('CAS number:', casMatch ? casMatch[1] : '');
+      saveMolecule(name.trim(), formula, mw, cas);
+    };
+    bubble.appendChild(saveBtn);
   } else {
     bubble.textContent = text;
   }
@@ -670,10 +940,23 @@ function addMsg(role, text) {
 }
 
 function renderMarkdown(text) {
-  return text
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const withBlocks = escaped
+    .replace(/\`\`\`([\s\S]*?)\`\`\`/g, '<pre>$1</pre>')
+    .replace(/^\|(.+)\|$/gm, row => {
+      const cells = row.split('|').slice(1, -1).map(cell => cell.trim());
+      if (cells.every(cell => /^-+$/.test(cell.replace(/\s/g, '')))) return '';
+      const tag = row.includes('---') ? 'th' : 'td';
+      return '<tr>' + cells.map(cell => '<' + tag + '>' + cell + '</' + tag + '>').join('') + '</tr>';
+    })
+    .replace(/(<tr>[\s\S]*?<\/tr>\n?)+/g, block => '<table>' + block + '</table>');
+
+  return withBlocks
+    .replace(/\`([^\`]+)\`/g, '<code>$1</code>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
@@ -681,10 +964,10 @@ function renderMarkdown(text) {
     .replace(/^\- (.+)$/gm, '<li>$1</li>')
     .replace(/(<li>.*<\/li>\n?)+/g, s => '<ul>' + s + '</ul>')
     .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>')
-    .replace(/^(?!<[huplbcpts])(.+)/, '<p>$1</p>');
+    .replace(/\n/g, '<br>');
 }
 
+// Typing indicator ─────────────────────────────────────────
 function showTyping() {
   hideWelcome();
   const msgs = document.getElementById('messages');
@@ -698,25 +981,24 @@ function showTyping() {
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
-
 function removeTyping() {
   const t = document.getElementById('typing-ind');
   if (t) t.remove();
 }
 
+// ── Send message ─────────────────────────────────────────────
 async function sendMessage() {
   if (isLoading) return;
-  if (!apiKey) {
-    openSettings();
-    return;
-  }
+  if (!apiKey) { openSettings(); return; }
   const input = document.getElementById('user-input');
   const text = input.value.trim();
   if (!text) return;
+  const drugDetail = findDrugDetail(text);
 
   input.value = '';
   input.style.height = 'auto';
   addMsg('user', text);
+  if (drugDetail) addMsg('assistant', formatDrugDetailMarkdown(drugDetail));
   history.push({ role: 'user', content: text });
   if (history.length > 20) history = history.slice(-20);
 
@@ -739,7 +1021,7 @@ async function sendMessage() {
           system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents: [
             ...geminiHistory,
-            { role: 'user', parts: [{ text: history[history.length - 1].content }] }
+            { role: 'user', parts: [{ text: buildDrugAwarePrompt(history[history.length - 1].content, drugDetail) }] }
           ],
           generationConfig: { maxOutputTokens: 1500, temperature: 0.3 }
         })
@@ -750,7 +1032,9 @@ async function sendMessage() {
     removeTyping();
 
     if (data.error) {
-      addMsg('assistant', `**API Error:** ${data.error.message}\n\nPlease check your Gemini API key.`);
+      addMsg('assistant', `**API Error:** ${data.error.message}
+
+Please check your Gemini API key.`);
     } else {
       const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
       history.push({ role: 'assistant', content: reply });
@@ -759,7 +1043,7 @@ async function sendMessage() {
     }
   } catch (err) {
     removeTyping();
-    addMsg('assistant', `**Connection error:** ${err.message}\n\nCheck your internet connection or Gemini API key.`);
+    addMsg('assistant', `**Connection error:** ${err.message}`);
   }
 
   isLoading = false;
@@ -768,10 +1052,7 @@ async function sendMessage() {
 }
 
 function askChip(q) {
-  if (!apiKey) {
-    openSettings();
-    return;
-  }
+  if (!apiKey) { openSettings(); return; }
   document.getElementById('user-input').value = q;
   sendMessage();
 }
@@ -779,13 +1060,11 @@ function askChip(q) {
 function clearChat() {
   history = [];
   const msgs = document.getElementById('messages');
-  msgs.innerHTML = '';
-  const welcome = document.createElement('div');
-  welcome.id = 'welcome';
-  welcome.style.textAlign = 'center';
-  welcome.style.padding = '48px 0 32px';
-  welcome.innerHTML = '<p style="color:var(--text-3);font-size:14px;">Chat cleared. Ready for new questions!</p>';
-  msgs.appendChild(welcome);
+  msgs.innerHTML = '<p style="text-align:center;color:#4d7a6a;font-size:14px;padding:40px 0;">Chat cleared. Ready for new questions!</p>';
+}
+
+function init() {
+  if (!apiKey) setTimeout(openSettings, 600);
 }
 
 init();
