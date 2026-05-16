@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pharma API Expert Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal-50: #E1F5EE;
+    --teal-100: #9FE1CB;
+    --teal-200: #5DCAA5;
+    --teal-400: #1D9E75;
+    --teal-600: #0F6E56;
+    --teal-800: #085041;
+    --teal-900: #04342C;
+    --bg: #0a0f0d;
+    --bg-2: #0f1712;
+    --bg-3: #141f1a;
+    --bg-card: #111916;
+    --border: rgba(29,158,117,0.15);
+    --border-hover: rgba(29,158,117,0.35);
+    --text-1: #e8f5f0;
+    --text-2: #8ab5a5;
+    --text-3: #4d7a6a;
+    --accent: #1D9E75;
+    --accent-dim: rgba(29,158,117,0.12);
+    --font-display: 'DM Serif Display', serif;
+    --font-body: 'Outfit', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text-1);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === BG GRID === */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(29,158,117,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,158,117,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === HEADER === */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,15,13,0.88);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+  }
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-wrap {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: var(--accent-dim);
+    border: 1px solid var(--border-hover);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-wrap svg { width: 20px; height: 20px; }
+  .header-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--text-1);
+    letter-spacing: -0.01em;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 300;
+    margin-left: 2px;
+  }
+  .status-pill {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid var(--border-hover);
+    border-radius: 20px;
+    padding: 4px 12px;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* === API KEY BANNER === */
+  #key-banner {
+    background: rgba(186,117,23,0.08);
+    border-bottom: 1px solid rgba(186,117,23,0.25);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 10;
+  }
+  #key-banner.hidden { display: none; }
+  .key-icon { font-size: 16px; }
+  #key-input {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(186,117,23,0.3);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-family: var(--font-mono);
+    color: var(--text-1);
+    outline: none;
+    max-width: 420px;
+  }
+  #key-input::placeholder { color: var(--text-3); }
+  #key-input:focus { border-color: rgba(186,117,23,0.6); }
+  #save-key-btn {
+    background: rgba(186,117,23,0.2);
+    border: 1px solid rgba(186,117,23,0.4);
+    border-radius: 8px;
+    padding: 7px 16px;
+    color: #EF9F27;
+    font-size: 13px;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  #save-key-btn:hover { background: rgba(186,117,23,0.35); }
+  .key-note { font-size: 12px; color: rgba(186,117,23,0.7); }
+
+  /* === MAIN === */
+  main {
+    flex: 1;
+    max-width: 860px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* === QUICK CHIPS === */
+  #chips-wrap {
+    padding: 16px 0 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+  .chip:hover {
+    border-color: var(--border-hover);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  /* === MESSAGES === */
+  #messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 16px 0 24px;
+    min-height: 400px;
+  }
+
+  .msg { display: flex; gap: 12px; align-items: flex-start; }
+  .msg.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .ai .avatar {
+    background: var(--accent-dim);
+    border: 1px solid var(--border-hover);
+  }
+  .ai .avatar svg { width: 16px; height: 16px; }
+  .user .avatar {
+    background: rgba(93,202,165,0.1);
+    border: 1px solid rgba(93,202,165,0.2);
+  }
+  .user .avatar svg { width: 16px; height: 16px; }
+
+  .bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.75;
+    position: relative;
+  }
+  .ai .bubble {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px 14px 14px 14px;
+    color: var(--text-1);
+  }
+  .user .bubble {
+    background: var(--accent-dim);
+    border: 1px solid var(--border-hover);
+    border-radius: 14px 4px 14px 14px;
+    color: var(--teal-50);
+  }
+
+  .bubble .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-family: var(--font-mono);
+  }
+
+  .bubble strong { color: var(--teal-100); font-weight: 500; }
+  .bubble em { color: var(--text-2); font-style: italic; }
+  .bubble code {
+    background: rgba(29,158,117,0.1);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--teal-200);
+  }
+  .bubble ul, .bubble ol { padding-left: 18px; }
+  .bubble li { margin-bottom: 4px; }
+  .bubble h3 { font-size: 13px; color: var(--accent); font-weight: 500; margin: 10px 0 4px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; }
+  .bubble p { margin-bottom: 8px; }
+  .bubble p:last-child { margin-bottom: 0; }
+  .bubble pre {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    overflow-x: auto;
+    margin: 8px 0;
+    white-space: pre-wrap;
+    color: var(--teal-100);
+  }
+  .bubble table { width:100%; border-collapse:collapse; font-size:13px; margin:8px 0; }
+  .bubble th { background:rgba(29,158,117,0.1); color:var(--accent); font-weight:500; padding:6px 10px; text-align:left; border:1px solid var(--border); font-size:12px; }
+  .bubble td { padding:6px 10px; border:1px solid var(--border); color:var(--text-2); }
+  .bubble tr:hover td { background:rgba(29,158,117,0.04); }
+
+  /* === TYPING === */
+  .typing-wrap { display:flex; gap:12px; align-items:flex-start; }
+  .typing-bubble {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px 14px 14px 14px;
+    padding: 14px 18px;
+    display: flex; gap: 5px; align-items: center;
+  }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: blink 1.3s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0.2;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
+
+  /* === INPUT AREA === */
+  #input-area {
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(to top, var(--bg) 80%, transparent);
+    padding: 16px 0 24px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    z-index: 10;
+  }
+  #user-input {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-family: var(--font-body);
+    color: var(--text-1);
+    resize: none;
+    outline: none;
+    min-height: 48px;
+    max-height: 140px;
+    line-height: 1.6;
+    transition: border-color 0.15s;
+  }
+  #user-input::placeholder { color: var(--text-3); }
+  #user-input:focus { border-color: var(--border-hover); }
+
+  .icon-btn {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    color: var(--text-2);
+  }
+  .icon-btn:hover { border-color: var(--border-hover); color: var(--text-1); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  #send-btn {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  #send-btn:hover { background: var(--teal-600); border-color: var(--teal-600); }
+  #send-btn:disabled { background: var(--bg-3); border-color: var(--border); color: var(--text-3); cursor:not-allowed; }
+
+  /* === WELCOME === */
+  #welcome {
+    text-align: center;
+    padding: 48px 0 32px;
+    animation: fadeIn 0.6s ease;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .welcome-icon {
+    width: 64px; height: 64px;
+    border-radius: 18px;
+    background: var(--accent-dim);
+    border: 1px solid var(--border-hover);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .welcome-icon svg { width: 32px; height: 32px; }
+  #welcome h1 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    color: var(--text-1);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  #welcome p { font-size: 14px; color: var(--text-2); font-weight: 300; max-width: 480px; margin: 0 auto 28px; line-height: 1.7; }
+  .capability-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    text-align: left;
+    margin-bottom: 24px;
+  }
+  .cap-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .cap-card:hover { border-color: var(--border-hover); background: var(--accent-dim); }
+  .cap-card svg { width: 16px; height: 16px; color: var(--accent); margin-bottom: 6px; }
+  .cap-card h3 { font-size: 13px; font-weight: 500; color: var(--text-1); margin-bottom: 2px; }
+  .cap-card p { font-size: 12px; color: var(--text-3); line-height: 1.5; }
+
+  /* === SCROLLBAR === */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 4px; }
+
+  @media (max-width: 600px) {
+    .header-sub { display: none; }
+    .capability-grid { grid-template-columns: 1fr 1fr; }
+    .bubble { max-width: 90%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-title">Pharma API Expert</div>
+      <div class="header-sub">Active Pharmaceutical Ingredients Specialist</div>
+    </div>
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      <span>Ready</span>
+    </div>
+  </div>
+</header>
+
+<!-- API Key Banner -->
+<div id="key-banner">
+  <span class="key-icon">🔑</span>
+  <input type="password" id="key-input" placeholder="Enter your Gemini API key..." />
+  <button id="save-key-btn" onclick="saveKey()">Save Key</button>
+  <span class="key-note">Key is stored only in your browser (localStorage)</span>
+</div>
+
+<main>
+  <!-- Quick chips -->
+  <div id="chips-wrap">
+    <span class="chip" onclick="askChip('How does HPLC work in pharmaceutical API testing? Explain principle, column types, detectors and system suitability parameters.')">⚗️ HPLC in API Testing</span>
+    <span class="chip" onclick="askChip('Explain GC headspace method for residual solvents testing per ICH Q3C. What are Class 1, 2, 3 solvent limits?')">🧪 GC Residual Solvents</span>
+    <span class="chip" onclick="askChip('What are ICH Q3A and Q3B impurity thresholds and reporting limits for API and drug products?')">📋 ICH Q3A/B Limits</span>
+    <span class="chip" onclick="askChip('Explain ICH M7 genotoxic impurity assessment and TTC concept with acceptable daily intake limits')">⚠️ Genotoxic Impurities</span>
+    <span class="chip" onclick="askChip('What is polymorphism in API? How does it affect bioavailability and what analytical methods detect it?')">🔬 Polymorphism</span>
+    <span class="chip" onclick="askChip('Explain ICH Q1A stability study design for API — storage conditions, time points, and degradation testing')">📦 Stability Studies</span>
+    <span class="chip" onclick="askChip('What is Drug Master File (DMF) Type II? What sections are required for API filing with FDA?')">📁 DMF Filing</span>
+  </div>
+
+  <!-- Messages -->
+  <div id="messages">
+    <div id="welcome">
+      <div class="welcome-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
+        </svg>
+      </div>
+      <h1>Pharma API Expert Agent</h1>
+      <p>Your specialist in Active Pharmaceutical Ingredients — regulatory guidelines, analytical testing, synthesis, quality specifications, and compliance.</p>
+      <div class="capability-grid">
+        <div class="cap-card" onclick="askChip('Explain HPLC method validation parameters per ICH Q2R1 for API assay testing')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+          <h3>Analytical Testing</h3>
+          <p>HPLC, GC, NMR, dissolution, Karl Fischer</p>
+        </div>
+        <div class="cap-card" onclick="askChip('What are ICH Q6A specifications for API — appearance, identification, assay, impurities and physicochemical tests?')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <h3>Quality Specs</h3>
+          <p>ICH Q6A, USP/EP/BP monographs</p>
+        </div>
+        <div class="cap-card" onclick="askChip('Explain ICH Q7 GMP requirements for API manufacturing — critical quality attributes and process controls')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          <h3>Regulatory</h3>
+          <p>ICH, FDA, EMA, DMF, CTD filing</p>
+        </div>
+        <div class="cap-card" onclick="askChip('Explain API synthesis route selection criteria — atom economy, green chemistry, impurity control and scalability')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+          <h3>Process Chemistry</h3>
+          <p>Synthesis routes, scale-up, process validation</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div id="input-area">
+    <button class="icon-btn" onclick="clearChat()" title="Clear chat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a1 1 0 011-1h2a1 1 0 011 1v2"/>
+      </svg>
+    </button>
+    <textarea id="user-input" placeholder="Ask about HPLC, GC, impurity limits, ICH guidelines, API synthesis..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="icon-btn" id="send-btn" onclick="sendMessage()" title="Send">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</main>
+
+<script>
+const SYSTEM_PROMPT = `You are a highly specialized expert in Pharmaceuticals API (Active Pharmaceutical Ingredients) with 20+ years of experience in pharmaceutical chemistry, regulatory affairs, analytical chemistry, and quality control.
+
+Your deep expertise covers:
+
+ANALYTICAL TESTING:
+- HPLC (RP-HPLC, HILIC, ion-exchange, SEC) — principle, column chemistry, mobile phases, UV/PDA/MS/RI detectors, system suitability (USP tailing factor, theoretical plates, resolution, %RSD), gradient methods
+- GC — headspace, direct injection, GC-FID, GC-MS, residual solvents per ICH Q3C (Class 1/2/3 limits in ppm)
+- NMR, IR, Raman for structural characterization and polymorph identification
+- Dissolution testing — USP apparatus 1/2, f2 similarity factor, sink conditions
+- Karl Fischer titration for water content
+- Particle size — laser diffraction, microscopy, sieve analysis
+- ICH Q2R1 method validation — accuracy, precision, specificity, LOD/LOQ, linearity, range, robustness
+
+REGULATORY & QUALITY:
+- ICH guidelines: Q1A (stability), Q2R1 (validation), Q3A/B/C/D (impurities), Q6A/B (specifications), Q7 (GMP for API), Q8/Q9/Q10/Q11 (pharmaceutical development), M7 (genotoxic impurities), S9
+- FDA, EMA, TGA, CDSCO requirements
+- Pharmacopoeial monographs: USP, EP, BP, IP, JP — specifications, tests, acceptance criteria
+- Drug Master File (DMF) Type II — CTD Module 3 structure, sections 3.2.S.1-3.2.S.7
+- Starting materials assessment, critical quality attributes (CQAs), control strategy
+
+PROCESS & CHEMISTRY:
+- API synthesis routes, key reagents, reaction mechanisms, byproduct formation
+- Salt selection, polymorph screening (XRPD, DSC, TGA)
+- Scale-up considerations, process validation (prospective/concurrent/retrospective)
+- Cleaning validation limits (Swab/Rinse, MACO calculation, 10 ppm criterion)
+- Impurity profiling — process impurities, degradation products, genotoxic impurities, elemental impurities (ICH Q3D)
+
+IMPURITY LIMITS (cite exactly):
+- ICH Q3A: Reporting threshold 0.05% or 1.0mg TDI; Identification 0.10% or 2mg TDI; Qualification 0.15% or 1mg TDI
+- ICH M7 TTC: 1.5 μg/day acceptable intake for genotoxic impurities
+- ICH Q3C Class 1 solvents: Benzene 2ppm, CCl4 4ppm, 1,2-DCE 5ppm
+- ICH Q3C Class 2: Acetonitrile 410ppm, DCM 600ppm, THF 720ppm, Methanol 3000ppm, Toluene 890ppm
+- ICH Q3D elemental impurities: Oral route limits in μg/day
+
+FORMAT YOUR RESPONSE:
+- Use **bold** for key terms, limits, and guideline names
+- Use ### for section headers when explaining multi-part topics
+- Provide specific numbers, limits, and acceptance criteria always
+- Use tables for comparing specifications or limits where helpful
+- Be technically precise and complete`;
+
+let history = [];
+let isLoading = false;
+let apiKey = localStorage.getItem('pharma_gemini_key') || '';
+
+function init() {
+  if (apiKey) {
+    document.getElementById('key-banner').classList.add('hidden');
+  } else {
+    document.getElementById('key-banner').style.display = 'flex';
+  }
+}
+
+function saveKey() {
+  const val = document.getElementById('key-input').value.trim();
+  if (!val) {
+    alert('Please enter your Gemini API key.');
+    return;
+  }
+  apiKey = val;
+  localStorage.setItem('pharma_gemini_key', apiKey);
+  document.getElementById('key-banner').classList.add('hidden');
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function hideWelcome() {
+  const w = document.getElementById('welcome');
+  if (w) w.remove();
+}
+
+function addMsg(role, text) {
+  hideWelcome();
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role === 'user' ? 'user' : 'ai');
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  if (role === 'user') {
+    avatar.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="#5DCAA5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+  } else {
+    avatar.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>`;
+  }
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+
+  if (role === 'assistant') {
+    bubble.innerHTML = '<div class="tag">PHARMA API EXPERT</div>' + renderMarkdown(text);
+  } else {
+    bubble.textContent = text;
+  }
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function renderMarkdown(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^\- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, s => '<ul>' + s + '</ul>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .replace(/^(?!<[huplbcpts])(.+)/, '<p>$1</p>');
+}
+
+function showTyping() {
+  hideWelcome();
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'typing-wrap'; div.id = 'typing-ind';
+  div.innerHTML = `
+    <div class="avatar" style="width:32px;height:32px;border-radius:50%;background:rgba(29,158,117,0.12);border:1px solid rgba(29,158,117,0.3);display:flex;align-items:center;justify-content:center;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+    </div>
+    <div class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-ind');
+  if (t) t.remove();
+}
+
+async function sendMessage() {
+  if (isLoading) return;
+  if (!apiKey) {
+    document.getElementById('key-banner').style.display = 'flex';
+    document.getElementById('key-input').focus();
+    return;
+  }
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  addMsg('user', text);
+  history.push({ role: 'user', content: text });
+  if (history.length > 20) history = history.slice(-20);
+
+  isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+  showTyping();
+
+  try {
+    const geminiHistory = history.slice(0, -1).map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+          contents: [
+            ...geminiHistory,
+            { role: 'user', parts: [{ text: history[history.length - 1].content }] }
+          ],
+          generationConfig: { maxOutputTokens: 1500, temperature: 0.3 }
+        })
+      }
+    );
+
+    const data = await res.json();
+    removeTyping();
+
+    if (data.error) {
+      addMsg('assistant', `**API Error:** ${data.error.message}\n\nPlease check your Gemini API key.`);
+    } else {
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+      history.push({ role: 'assistant', content: reply });
+      if (history.length > 20) history = history.slice(-20);
+      addMsg('assistant', reply);
+    }
+  } catch (err) {
+    removeTyping();
+    addMsg('assistant', `**Connection error:** ${err.message}\n\nCheck your internet connection or Gemini API key.`);
+  }
+
+  isLoading = false;
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+}
+
+function askChip(q) {
+  if (!apiKey) {
+    document.getElementById('key-banner').style.display = 'flex';
+    document.getElementById('key-input').focus();
+    return;
+  }
+  document.getElementById('user-input').value = q;
+  sendMessage();
+}
+
+function clearChat() {
+  history = [];
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = '';
+  const welcome = document.createElement('div');
+  welcome.id = 'welcome';
+  welcome.style.textAlign = 'center';
+  welcome.style.padding = '48px 0 32px';
+  welcome.innerHTML = '<p style="color:var(--text-3);font-size:14px;">Chat cleared. Ready for new questions!</p>';
+  msgs.appendChild(welcome);
+}
+
+init();
+</script>
+</body>
+</html>
