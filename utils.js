@@ -43,22 +43,26 @@ export async function readTextFile(file) {
   });
 }
 
-async function extractDocxText(file) {
-  if (typeof mammoth === 'undefined') throw new Error("Mammoth.js not loaded. Please ensure internet connection.");
+export async function extractDocxText(fileOrBuffer) {
+  if (typeof mammoth === 'undefined') throw new Error("Mammoth.js not loaded.");
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const arrayBuffer = e.target.result;
-        // Extract raw text preserving basic structure
-        const result = await mammoth.extractRawText({ arrayBuffer });
-        resolve(result.value);
-      } catch(err) {
-        reject(err);
-      }
-    };
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
+    if (fileOrBuffer instanceof ArrayBuffer) {
+      mammoth.extractRawText({ arrayBuffer: fileOrBuffer })
+        .then(result => resolve(result.value))
+        .catch(reject);
+    } else {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const result = await mammoth.extractRawText({ arrayBuffer: e.target.result });
+          resolve(result.value);
+        } catch(err) {
+          reject(err);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(fileOrBuffer);
+    }
   });
 }
 
