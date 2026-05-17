@@ -121,10 +121,50 @@ async function loadFileToTextarea(event, textareaId, docType = 'File') {
   try {
     const text = await readTextFile(file);
     document.getElementById(textareaId).value = text;
-    chat.addMessage('assistant', `Successfully extracted ${text.length} characters from ${file.name}. You can now review it in the side panel and generate the ${docType}.`);
+    
+    // Auto-extract metadata if it's a process or protocol file
+    if (docType === 'PV Protocol' || textareaId === 'process-input') {
+      const extractedCount = extractMetadataFromText(text);
+      if (extractedCount > 0) {
+        chat.addMessage('assistant', `Successfully extracted ${text.length} characters from ${file.name}. \n\n**Auto-detected ${extractedCount} product details** and filled them in the 'Product Details' section!`);
+      } else {
+        chat.addMessage('assistant', `Successfully extracted ${text.length} characters from ${file.name}. You can now review it in the side panel and generate the ${docType}.`);
+      }
+      
+      // Auto-open Product Details accordion to show what was filled
+      document.querySelector('details.accordion').open = true;
+    } else {
+      chat.addMessage('assistant', `Successfully extracted ${text.length} characters from ${file.name}. You can now review it in the side panel and generate the ${docType}.`);
+    }
   } catch(e) {
     chat.addMessage('assistant', `**Error parsing ${file.name}:** ` + e.message);
   }
+}
+
+function extractMetadataFromText(text) {
+  let count = 0;
+  // Product Name
+  const nameMatch = text.match(/(?:Product Name|Product|Name of Product|Name)\s*[:\-]?\s*([A-Za-z0-9\-\s\(\)]+?)(?=\n|\r|\||(?:\s{3,}))/i);
+  if (nameMatch && nameMatch[1]) {
+    const el = document.getElementById('plan-product-name');
+    if (!el.value) { el.value = nameMatch[1].trim(); count++; }
+  }
+  
+  // Product Code
+  const codeMatch = text.match(/(?:Product Code|Item Code|Code|Material Code)\s*[:\-]?\s*([A-Za-z0-9\-]+)/i);
+  if (codeMatch && codeMatch[1]) {
+    const el = document.getElementById('plan-product-code');
+    if (!el.value) { el.value = codeMatch[1].trim(); count++; }
+  }
+  
+  // Batch Size
+  const batchMatch = text.match(/(?:Batch Size|B\.S\.|Std\. Batch Size|Batch Quantity)\s*[:\-]?\s*([\d\.,]+\s*(?:kg|g|mg|l|ml|kl|pcs|nos))/i);
+  if (batchMatch && batchMatch[1]) {
+    const el = document.getElementById('plan-batch-size');
+    if (!el.value) { el.value = batchMatch[1].trim(); count++; }
+  }
+  
+  return count;
 }
 
 function saveEquipmentMaster() {
