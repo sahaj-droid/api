@@ -287,10 +287,15 @@ async function sendPrompt(text) {
   }
 }
 
-chat.init();
-initEvents();
-loadSavedEquipmentMasterOnStart();
-if (!storage.getKey()) setTimeout(window.openSettings, 500);
+async function startApp() {
+  await storage.init();
+  chat.init();
+  initEvents();
+  loadSavedEquipmentMasterOnStart();
+  if (!storage.getKey()) setTimeout(window.openSettings, 500);
+}
+
+startApp();
 
 function loadSavedEquipmentMasterOnStart() {
   const savedEq = storage.getEquipmentMaster();
