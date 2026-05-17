@@ -4,8 +4,21 @@ import { openPrintableReport, signatureTable, table } from './reports.js';
 let lastProtocolHtml = '';
 
 export function formatProtocol(rawText, meta = {}) {
-  const text = String(rawText || '').trim();
+  let text = String(rawText || '').trim();
   if (!text) throw new Error('Paste or upload a Process Validation Protocol first.');
+  
+  // Substitute placeholders with new product details
+  if (meta.productName) text = text.replace(/\{\{PRODUCT_NAME\}\}/g, meta.productName);
+  if (meta.productCode) text = text.replace(/\{\{PRODUCT_CODE\}\}/g, meta.productCode);
+  if (meta.batchSizeText) text = text.replace(/\{\{BATCH_SIZE\}\}/g, meta.batchSizeText);
+
+  // Substitute dynamic user-defined variables
+  if (meta.dynamicVars) {
+    for (const [key, val] of Object.entries(meta.dynamicVars)) {
+       if (val) text = text.split(`{{${key}}}`).join(val);
+    }
+  }
+
   const sections = extractProtocolSections(text);
   lastProtocolHtml = buildProtocolHtml(sections, meta, text);
   return '<h3>Editable Process Validation Protocol</h3>' + lastProtocolHtml + '<button class="mini-action" id="inline-print-protocol">Print / Save PV PDF</button>';
