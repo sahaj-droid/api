@@ -243,6 +243,114 @@
     line-height: 1.35;
   }
 
+
+  .panel-input, .panel-select, .panel-textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(29,158,117,0.18);
+    border-radius: 7px;
+    color: var(--text-1);
+    font-family: var(--font-body);
+    font-size: 12px;
+    outline: none;
+    padding: 8px 9px;
+    margin-bottom: 8px;
+  }
+  .panel-textarea {
+    min-height: 62px;
+    resize: vertical;
+  }
+  .panel-input::placeholder, .panel-textarea::placeholder { color: var(--text-3); }
+  .panel-input:focus, .panel-select:focus, .panel-textarea:focus { border-color: var(--border-hover); }
+  .action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .builder-note {
+    color: var(--text-3);
+    font-size: 11px;
+    line-height: 1.45;
+    margin: 8px 0 0;
+  }
+  .search-empty {
+    color: var(--text-3);
+    font-size: 12px;
+    line-height: 1.45;
+    padding: 8px 0 0;
+  }
+  .report-shell {
+    background: #ffffff;
+    color: #17211d;
+    font-family: Arial, sans-serif;
+    line-height: 1.45;
+    padding: 28px;
+  }
+  .report-shell h1, .report-shell h2, .report-shell h3 { color: #0f5f49; }
+  .report-shell h1 { font-size: 24px; margin: 0 0 8px; }
+  .report-shell h2 { font-size: 16px; border-bottom: 1px solid #b8d7cb; padding-bottom: 5px; margin-top: 22px; }
+  .report-shell h3 { font-size: 13px; margin: 14px 0 6px; }
+  .report-shell table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px; }
+  .report-shell th, .report-shell td { border: 1px solid #b8d7cb; padding: 7px 8px; text-align: left; vertical-align: top; }
+  .report-shell th { background: #eaf6f1; color: #0f5f49; }
+  .report-meta { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 14px 0; }
+  .report-meta div { border: 1px solid #b8d7cb; padding: 8px; }
+  .report-actions {
+    position: sticky;
+    top: 0;
+    background: #ffffff;
+    border-bottom: 1px solid #d7e6e0;
+    padding: 10px 0 14px;
+    margin-bottom: 10px;
+  }
+  .report-actions button {
+    background: #0f6e56;
+    border: 0;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    padding: 8px 12px;
+    margin-right: 8px;
+  }
+
+  .planner-output {
+    display: grid;
+    gap: 10px;
+  }
+  .planner-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    margin: 8px 0;
+  }
+  .planner-kpi {
+    border: 1px solid rgba(29,158,117,0.16);
+    background: rgba(29,158,117,0.06);
+    border-radius: 8px;
+    padding: 10px;
+  }
+  .planner-kpi b {
+    display: block;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .planner-kpi span {
+    color: var(--text-1);
+    font-size: 14px;
+  }
+  .planner-status-ok { color: #9FE1CB; }
+  .planner-status-warn { color: #EF9F27; }
+
+  @media print {
+    body { background: #fff !important; }
+    .report-actions { display: none; }
+    .report-shell { padding: 0; }
+  }
+
   .mini-action {
     background: rgba(29,158,117,0.1);
     border: 1px solid rgba(29,158,117,0.22);
@@ -716,6 +824,42 @@
 
   <div class="app-layout">
     <aside class="side-panel">
+      <div class="panel-block">
+        <div class="panel-title">Drug Search <span class="panel-count" id="drug-search-count">7</span></div>
+        <input class="panel-input" id="drug-search-input" placeholder="Search API name, CAS, class..." oninput="renderDrugSearch(this.value)" />
+        <div id="drug-search-results" class="side-list"></div>
+      </div>
+      <div class="panel-block">
+        <div class="panel-title">Validation Builder</div>
+        <input class="panel-input" id="val-product-name" placeholder="Product name / API name" />
+        <input class="panel-input" id="val-product-code" placeholder="Product code" />
+        <input class="panel-input" id="val-cleaning-solvent" placeholder="Cleaning solvent, e.g. Purified Water / IPA" />
+        <input class="panel-input" id="val-equipment" placeholder="Equipment train, e.g. Reactor, Filter Dryer" />
+        <input class="panel-input" id="val-batch-size" placeholder="Batch size / strength / campaign size" />
+        <textarea class="panel-textarea" id="val-extra-details" placeholder="Optional: worst-case basis, previous product, route, sampling points..."></textarea>
+        <div class="action-row">
+          <button class="mini-action" onclick="generateValidationReport('process')">Process PDF</button>
+          <button class="mini-action" onclick="generateValidationReport('cleaning')">Cleaning PDF</button>
+        </div>
+        <p class="builder-note">Opens a print-ready report. Use Print and choose Save as PDF.</p>
+      </div>
+      <div class="panel-block">
+        <div class="panel-title">Equipment Planning</div>
+        <input class="panel-input" id="plan-product-name" placeholder="Product name" />
+        <input class="panel-input" id="plan-product-code" placeholder="Product code" />
+        <input class="panel-input" id="plan-batch-size" placeholder="Batch size, e.g. 100 kg" />
+        <input class="panel-input" id="plan-output-target" placeholder="Optional monthly target, e.g. 1000 kg" />
+        <input class="panel-input" id="plan-shifts" placeholder="Working hours/day, e.g. 24" />
+        <input class="panel-input" type="file" id="equipment-file" accept=".txt,.csv,.tsv" onchange="loadPlannerFile('equipment-file','equipment-master-input')" />
+        <textarea class="panel-textarea" id="equipment-master-input" placeholder="Paste equipment master: tag, type, capacity, min, max, MOC, agitator, baffles, cleaning time..."></textarea>
+        <input class="panel-input" type="file" id="process-file" accept=".txt,.csv,.tsv" onchange="loadPlannerFile('process-file','process-input')" />
+        <textarea class="panel-textarea" id="process-input" placeholder="Paste/upload process steps or BMR text. The app will infer reactor/filter/centrifuge/dryer needs."></textarea>
+        <div class="action-row">
+          <button class="mini-action" onclick="generateEquipmentPlan()">Map Plan</button>
+          <button class="mini-action" onclick="printLastEquipmentPlan()">Plan PDF</button>
+        </div>
+        <p class="builder-note">First version supports TXT/CSV/TSV paste or upload. Excel/PDF parsing can come after refactor.</p>
+      </div>
       <div class="panel-block">
         <div class="panel-title">Saved Drugs <span class="panel-count" id="saved-count">0</span></div>
         <div id="saved-drug-list" class="side-list"></div>
@@ -1367,8 +1511,492 @@ function saveMoleculeFromText(text) {
   saveMolecule(name.trim(), formula, mw, cas);
 }
 
+function renderDrugSearch(query = '') {
+  const list = document.getElementById('drug-search-results');
+  const count = document.getElementById('drug-search-count');
+  if (!list) return;
+  const q = normalizeDrugName(query);
+  const matches = DRUG_DETAILS.filter(drug => {
+    const haystack = normalizeDrugName([drug.displayName, drug.cas, drug.drugClass, drug.formula, drug.names.join(' ')].join(' '));
+    return !q || haystack.includes(q);
+  });
+  if (count) count.textContent = String(matches.length);
+  if (!matches.length) {
+    list.innerHTML = '<div class="search-empty">No matching drug in local library. You can still ask in chat by typing the name.</div>';
+    return;
+  }
+  list.innerHTML = matches.map(drug =>
+    '<div class="side-item" onclick="askChip(\'Give complete API drug details for ' + escapeForJs(drug.displayName) + ' including formula, IUPAC, CAS, impurities, assay, storage and regulatory specifications.\')">' +
+      '<strong>' + escapeHtml(drug.displayName) + '</strong><span>' + escapeHtml(drug.formula) + ' | ' + escapeHtml(drug.cas) + '</span>' +
+    '</div>'
+  ).join('');
+}
+
+function getValidationInputs() {
+  const value = id => (document.getElementById(id)?.value || '').trim();
+  return {
+    productName: value('val-product-name'),
+    productCode: value('val-product-code'),
+    cleaningSolvent: value('val-cleaning-solvent'),
+    equipment: value('val-equipment'),
+    batchSize: value('val-batch-size'),
+    extraDetails: value('val-extra-details')
+  };
+}
+
+function generateValidationReport(type) {
+  const data = getValidationInputs();
+  if (!data.productName || !data.productCode) {
+    alert('Please enter at least Product name and Product code.');
+    return;
+  }
+  if (type === 'cleaning' && !data.cleaningSolvent) {
+    alert('Please enter Cleaning Solvent for cleaning validation.');
+    return;
+  }
+  const html = type === 'cleaning' ? buildCleaningValidationReport(data) : buildProcessValidationReport(data);
+  openPrintableReport(html, type === 'cleaning' ? 'Cleaning Validation Protocol' : 'Process Validation Protocol');
+}
+
+function reportMetaRows(data) {
+  return '<div class="report-meta">' +
+    '<div><strong>Product Name</strong><br>' + escapeHtml(data.productName) + '</div>' +
+    '<div><strong>Product Code</strong><br>' + escapeHtml(data.productCode) + '</div>' +
+    '<div><strong>Equipment / Line</strong><br>' + escapeHtml(data.equipment || 'To be defined') + '</div>' +
+    '<div><strong>Batch / Campaign Size</strong><br>' + escapeHtml(data.batchSize || 'To be defined') + '</div>' +
+  '</div>';
+}
+
+function buildProcessValidationReport(data) {
+  const today = new Date().toLocaleDateString();
+  return '<div class="report-shell">' +
+    '<div class="report-actions"><button onclick="window.print()">Print / Save as PDF</button><button onclick="window.close()">Close</button></div>' +
+    '<h1>Process Validation Protocol</h1><p><strong>Generated:</strong> ' + escapeHtml(today) + '</p>' + reportMetaRows(data) +
+    '<h2>1. Objective</h2><p>To provide documented evidence that the manufacturing process for <strong>' + escapeHtml(data.productName) + '</strong> consistently produces API meeting predefined quality attributes and acceptance criteria.</p>' +
+    '<h2>2. Scope</h2><p>This protocol applies to process validation batches for product code <strong>' + escapeHtml(data.productCode) + '</strong>, covering dispensing, reaction/processing, isolation, drying, milling/sieving, blending, packing, and in-process controls as applicable.</p>' +
+    '<h2>3. Responsibilities</h2>' + table(['Function','Responsibility'], [['Production','Execute the approved batch manufacturing record and record process parameters.'],['Quality Assurance','Approve protocol/report, review deviations, and release validation conclusions.'],['Quality Control','Perform in-process, finished API, impurity, residual solvent, and stability-indicating tests.'],['Engineering','Ensure equipment qualification, calibration, utilities, and preventive maintenance status.']]) +
+    '<h2>4. Validation Strategy</h2>' + table(['Item','Requirement'], [['Validation approach','Prospective validation using three consecutive successful commercial/validation-scale batches unless justified otherwise.'],['Critical process parameters','Define CPPs for each unit operation and monitor against approved ranges.'],['Critical quality attributes','Assay, related substances, residual solvents, water/LOD, particle size, polymorphic form, residue on ignition/sulfated ash, and applicable microbiological/elemental impurity controls.'],['Hold time','Define and verify intermediate, wet cake, dried API, and packed API hold times where applicable.']]) +
+    '<h2>5. Process Validation Matrix</h2>' + table(['Stage','CPP / Control','Sampling / Test','Acceptance Criteria'], [['Raw material dispensing','Material identity, quantity, status label','Line clearance and dispensing verification','As per approved BMR and material specifications'],['Manufacturing reaction/process','Temperature, time, pH, pressure, agitation, addition rate','IPC sample where applicable','Within approved process ranges'],['Isolation / filtration','Filtration time, wash volume, cake condition','Mother liquor/wash checks if applicable','Meets predefined IPC limits'],['Drying','Temperature, vacuum/airflow, drying time','LOD/water, residual solvent','As per API specification or validated limit'],['Milling / sieving','Screen size, speed, time','Particle size distribution','As per product requirement'],['Final packing','Container closure, label, net weight','Finished API sample','Complies with approved specification']]) +
+    '<h2>6. Sampling Plan</h2><p>Collect representative samples from predefined locations and process stages. Include top/middle/bottom or beginning/middle/end samples where blend, drying, milling, or packing uniformity is relevant.</p>' +
+    '<h2>7. Deviation and Change Control</h2><p>Any departure from approved process ranges, equipment, batch size, sampling plan, or analytical method must be documented, investigated, impact-assessed, and approved by QA before validation conclusion.</p>' +
+    '<h2>8. Acceptance Criteria</h2><ul><li>All validation batches meet approved API specifications.</li><li>CPPs remain within approved limits or scientifically justified ranges.</li><li>No unexplained OOS/OOT result remains open.</li><li>Yield and impurity trends are consistent and justified.</li><li>All deviations and changes are closed before report approval.</li></ul>' +
+    '<h2>9. Additional Product Details</h2><p>' + escapeHtml(data.extraDetails || 'No additional details provided.') + '</p>' +
+    '<h2>10. Approval</h2>' + signatureTable() + '</div>';
+}
+
+function buildCleaningValidationReport(data) {
+  const today = new Date().toLocaleDateString();
+  return '<div class="report-shell">' +
+    '<div class="report-actions"><button onclick="window.print()">Print / Save as PDF</button><button onclick="window.close()">Close</button></div>' +
+    '<h1>Cleaning Validation Protocol</h1><p><strong>Generated:</strong> ' + escapeHtml(today) + '</p>' + reportMetaRows(data) +
+    '<div class="report-meta"><div><strong>Cleaning Solvent</strong><br>' + escapeHtml(data.cleaningSolvent) + '</div><div><strong>Document Type</strong><br>Cleaning Validation Protocol / Report Template</div></div>' +
+    '<h2>1. Objective</h2><p>To demonstrate that the cleaning procedure for equipment used in manufacturing <strong>' + escapeHtml(data.productName) + '</strong> effectively removes product residue, cleaning solvent, detergent where used, and microbial/particulate contamination to acceptable levels.</p>' +
+    '<h2>2. Scope</h2><p>This protocol covers equipment contact surfaces, hard-to-clean locations, cleaning agent/solvent use, rinse and/or swab sampling, analytical method requirements, and acceptance criteria for product code <strong>' + escapeHtml(data.productCode) + '</strong>.</p>' +
+    '<h2>3. Cleaning Inputs</h2>' + table(['Parameter','Value / Requirement'], [['Product / API', data.productName],['Product code', data.productCode],['Cleaning solvent', data.cleaningSolvent],['Equipment train', data.equipment || 'To be defined'],['Batch/campaign size', data.batchSize || 'To be defined'],['Worst-case basis','Solubility, toxicity/PDE/ADE, potency, cleanability, batch size, shared equipment surface area, and previous-product risk']]) +
+    '<h2>4. Sampling Plan</h2>' + table(['Sample Type','Location / Purpose','Acceptance Criteria'], [['Swab sample','Worst-case product contact surfaces, joints, valves, agitator, discharge points, gaskets, filters','Residue below calculated swab limit'],['Rinse sample','Final rinse after cleaning using ' + data.cleaningSolvent,'Residue below calculated rinse limit'],['Visual inspection','All accessible equipment surfaces','No visible residue, stain, or foreign matter'],['Microbial sample','Where water-based cleaning or hold time risk exists','Within approved microbiological limits']]) +
+    '<h2>5. MACO / Limit Calculation Template</h2>' + table(['Calculation Element','Formula / Requirement'], [['Health-based limit','Use PDE/ADE where available; otherwise justify 10 ppm, dose-based, or visual cleanliness approach'],['MACO dose criterion','MACO = (Min daily dose next product x safety factor) / Max daily dose previous product'],['10 ppm criterion','Not more than 10 ppm of previous product in next product batch, unless health-based limit is stricter'],['Swab limit','Swab limit = MACO x swab area / total shared product contact surface area'],['Rinse limit','Rinse limit = MACO / final rinse volume, adjusted for recovery factor'],['Recovery','Analytical method recovery must be established for surface/material and residue type']]) +
+    '<h2>6. Analytical Method</h2><p>Use a validated or verified stability-indicating method appropriate for residue detection, such as HPLC/UPLC, TOC, UV, conductivity, pH, or specific residue method. Method suitability must include specificity, linearity, accuracy/recovery, precision, LOD/LOQ, range, and solution stability as applicable.</p>' +
+    '<h2>7. Cleaning Procedure Verification</h2>' + table(['Step','Verification Point'], [['Pre-cleaning','Line clearance, equipment status, product removal, and dirty hold time check'],['Cleaning execution','Solvent volume, contact time, temperature, flow rate, manual scrubbing points, and number of cycles'],['Final rinse/drying','Final rinse quality, drainability, drying condition, and clean hold time'],['Post-cleaning storage','Equipment status label, protection from contamination, and clean hold validity']]) +
+    '<h2>8. Acceptance Criteria</h2><ul><li>All swab/rinse results are below approved residue limits after recovery correction.</li><li>Visual inspection passes before sampling.</li><li>Cleaning solvent residues are controlled and justified.</li><li>Microbial limits meet approved requirements where applicable.</li><li>No unresolved deviation, OOS, or failed re-cleaning investigation remains open.</li></ul>' +
+    '<h2>9. Additional Product Details</h2><p>' + escapeHtml(data.extraDetails || 'No additional details provided.') + '</p>' +
+    '<h2>10. Approval</h2>' + signatureTable() + '</div>';
+}
+
+function table(headers, rows) {
+  return '<table><thead><tr>' + headers.map(h => '<th>' + escapeHtml(h) + '</th>').join('') + '</tr></thead><tbody>' +
+    rows.map(row => '<tr>' + row.map(cell => '<td>' + escapeHtml(cell) + '</td>').join('') + '</tr>').join('') +
+    '</tbody></table>';
+}
+
+function signatureTable() {
+  return table(['Role','Name / Signature','Date'], [['Prepared by','',''],['Checked by','',''],['Production Head','',''],['QC Head','',''],['QA Approval','','']]);
+}
+
+function openPrintableReport(reportHtml, title) {
+  const reportWindow = window.open('', '_blank');
+  if (!reportWindow) {
+    alert('Popup blocked. Please allow popups to generate the PDF-ready report.');
+    return;
+  }
+  reportWindow.document.write('<!DOCTYPE html><html><head><title>' + escapeHtml(title) + '</title><style>' + document.querySelector('style').innerHTML + '</style></head><body>' + reportHtml + '</body></html>');
+  reportWindow.document.close();
+  reportWindow.focus();
+}
+
+let lastEquipmentPlan = null;
+
+function loadPlannerFile(fileInputId, targetTextareaId) {
+  const input = document.getElementById(fileInputId);
+  const target = document.getElementById(targetTextareaId);
+  const file = input?.files?.[0];
+  if (!file || !target) return;
+  const reader = new FileReader();
+  reader.onload = () => { target.value = String(reader.result || ''); };
+  reader.readAsText(file);
+}
+
+function generateEquipmentPlan() {
+  const data = getPlanningInputs();
+  if (!data.productName || !data.productCode || !data.batchSizeText) {
+    alert('Please enter Product name, Product code, and Batch size.');
+    return;
+  }
+  if (!data.equipmentText || !data.processText) {
+    alert('Please paste or upload both Equipment details and Process details.');
+    return;
+  }
+  const equipment = parseEquipmentMaster(data.equipmentText);
+  const steps = inferProcessSteps(data.processText, data);
+  if (!equipment.length) {
+    alert('No equipment could be parsed. Add rows with equipment tag/type/capacity.');
+    return;
+  }
+  if (!steps.length) {
+    alert('No process steps could be inferred. Add process step lines or operation descriptions.');
+    return;
+  }
+  const mapped = mapEquipmentToSteps(steps, equipment);
+  const summary = summarizeProductionPlan(mapped, equipment, data);
+  lastEquipmentPlan = { data, equipment, steps: mapped, summary };
+  addMsg('assistant', renderEquipmentPlanMarkdown(lastEquipmentPlan));
+}
+
+function getPlanningInputs() {
+  const value = id => (document.getElementById(id)?.value || '').trim();
+  return {
+    productName: value('plan-product-name'),
+    productCode: value('plan-product-code'),
+    batchSizeText: value('plan-batch-size'),
+    batchSizeKg: extractNumber(value('plan-batch-size')) || 0,
+    outputTargetKg: extractNumber(value('plan-output-target')) || 0,
+    workingHoursPerDay: extractNumber(value('plan-shifts')) || 24,
+    equipmentText: value('equipment-master-input'),
+    processText: value('process-input')
+  };
+}
+
+function parseEquipmentMaster(text) {
+  const rows = parseRows(text);
+  return rows.map((row, index) => {
+    const joined = Object.values(row).join(' ');
+    const type = detectEquipmentType(joined);
+    const capacityText = getAny(row, ['capacity', 'working volume', 'max volume', 'size', 'load', 'working capacity', 'volume']) || joined;
+    const minText = getAny(row, ['min', 'minimum', 'minimum volume', 'min volume']) || '';
+    const maxText = getAny(row, ['max', 'maximum', 'maximum volume', 'max volume']) || capacityText;
+    return {
+      id: getAny(row, ['equipment id', 'id', 'tag', 'equipment tag', 'equipment', 'name']) || 'EQ-' + (index + 1),
+      type,
+      rawType: getAny(row, ['type', 'equipment type', 'category']) || type,
+      capacity: normalizeCapacity(capacityText),
+      minCapacity: normalizeCapacity(minText) || 0,
+      maxCapacity: normalizeCapacity(maxText) || normalizeCapacity(capacityText),
+      moc: getAny(row, ['moc', 'material', 'material of construction']) || detectMoc(joined),
+      agitator: getAny(row, ['agitator', 'agitator type']) || findKeyword(joined, ['anchor', 'turbine', 'pitch blade', 'paddle', 'propeller', 'magnetic']),
+      baffles: getAny(row, ['baffle', 'baffles', 'baffle detail']) || (containsAny(joined, ['baffle']) ? 'Available' : 'Not specified'),
+      cleaningHours: extractDurationHours(getAny(row, ['cleaning', 'cleaning time', 'changeover']) || '') || defaultCleaningHours(type),
+      location: getAny(row, ['area', 'block', 'location']) || 'Not specified'
+    };
+  }).filter(eq => eq.id && eq.type !== 'unknown');
+}
+
+function inferProcessSteps(text, data) {
+  const rows = parseRows(text);
+  const usableRows = rows.length > 1 ? rows : text.split(/\r?\n/).map((line, i) => ({ step: String(i + 1), description: line.trim() })).filter(r => r.description);
+  return usableRows.map((row, index) => {
+    const desc = Object.values(row).join(' ');
+    const type = detectEquipmentType(desc);
+    const duration = extractDurationHours(desc) || defaultStepHours(type);
+    const volume = extractCapacityWithUnit(desc) || estimateLoad(type, data.batchSizeKg);
+    const moc = inferRequiredMoc(desc);
+    return {
+      stepNo: getAny(row, ['step', 'step no', 'sr no', 'stage']) || String(index + 1),
+      description: getAny(row, ['description', 'process', 'operation', 'activity']) || desc,
+      type,
+      requiredLoad: volume,
+      durationHours: duration,
+      cleaningHours: defaultCleaningHours(type),
+      requiredMoc: moc,
+      dependency: index === 0 ? 'Start' : 'After step ' + index,
+      assumptions: buildStepAssumptions(desc, type, volume, duration, moc)
+    };
+  }).filter(step => step.description && step.type !== 'unknown');
+}
+
+function parseRows(text) {
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (!lines.length) return [];
+  const delimiter = lines[0].includes('\t') ? '\t' : lines[0].includes('|') ? '|' : ',';
+  const first = splitRow(lines[0], delimiter);
+  const hasHeader = first.some(cell => /equipment|tag|type|capacity|step|operation|process|description|moc/i.test(cell));
+  if (!hasHeader) {
+    return lines.map((line, i) => ({ index: String(i + 1), description: line }));
+  }
+  const headers = first.map(h => normalizeHeader(h));
+  return lines.slice(1).map(line => {
+    const cells = splitRow(line, delimiter);
+    const row = {};
+    headers.forEach((header, i) => { row[header] = cells[i] || ''; });
+    return row;
+  });
+}
+
+function splitRow(line, delimiter) {
+  return line.split(delimiter).map(v => v.trim()).filter((v, i, arr) => delimiter !== '|' || v || i > 0 && i < arr.length - 1);
+}
+
+function normalizeHeader(value) {
+  return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function getAny(row, names) {
+  for (const name of names) {
+    const key = normalizeHeader(name);
+    if (row[key]) return row[key];
+  }
+  return '';
+}
+
+function detectEquipmentType(text) {
+  const t = normalizeDrugName(text);
+  if (containsAny(t, ['centrifuge', 'centrifugal'])) return 'centrifuge';
+  if (containsAny(t, ['filter dryer', 'anfd', 'nutsche'])) return 'filter dryer';
+  if (containsAny(t, ['filter', 'filtration', 'sparkler', 'leaf filter', 'pressure filter'])) return 'filter';
+  if (containsAny(t, ['dryer', 'drying', 'tray dryer', 'vtd', 'fbd', 'vacuum dryer'])) return 'dryer';
+  if (containsAny(t, ['mill', 'milling', 'sieve', 'sifter', 'multimill'])) return 'mill';
+  if (containsAny(t, ['reactor', 'reaction', 'reflux', 'distillation', 'hydrogenation', 'charge', 'stir', 'agitator', 'crystallization'])) return 'reactor';
+  if (containsAny(t, ['blender', 'blending', 'mixer'])) return 'blender';
+  return 'unknown';
+}
+
+function containsAny(text, words) {
+  const t = String(text || '').toLowerCase();
+  return words.some(word => t.includes(word));
+}
+
+function findKeyword(text, words) {
+  const t = String(text || '').toLowerCase();
+  return words.find(word => t.includes(word)) || 'Not specified';
+}
+
+function extractCapacityWithUnit(text) {
+  const t = String(text || '').toLowerCase();
+  const unitMatch = t.match(/(\d+(?:\.\d+)?)\s*(kl|kilo\s*liter|kiloliters?|l|ltr|liters?|kg|kgs?)\b/);
+  if (!unitMatch) return 0;
+  const value = Number(unitMatch[1]);
+  const unit = unitMatch[2];
+  if (/kl|kilo|kilolit/.test(unit)) return value * 1000;
+  return value;
+}
+
+function normalizeCapacity(text) {
+  const t = String(text || '').toLowerCase();
+  const unitMatch = t.match(/(\d+(?:\.\d+)?)\s*(kl|kilo\s*liter|kiloliters?|l|ltr|liters?|kg|kgs?)\b/);
+  if (unitMatch) {
+    const value = Number(unitMatch[1]);
+    const unit = unitMatch[2];
+    if (/kl|kilo|kilolit/.test(unit)) return value * 1000;
+    return value;
+  }
+  const value = extractNumber(text);
+  return value || 0;
+}
+
+function extractNumber(text) {
+  const match = String(text || '').match(/(\d+(?:\.\d+)?)/);
+  return match ? Number(match[1]) : 0;
+}
+
+function extractDurationHours(text) {
+  const t = String(text || '').toLowerCase();
+  const hour = t.match(/(\d+(?:\.\d+)?)\s*(?:hr|hrs|hour|hours|h)\b/);
+  if (hour) return Number(hour[1]);
+  const min = t.match(/(\d+(?:\.\d+)?)\s*(?:min|mins|minute|minutes)\b/);
+  if (min) return Math.round((Number(min[1]) / 60) * 10) / 10;
+  return 0;
+}
+
+function inferRequiredMoc(text) {
+  const t = String(text || '').toLowerCase();
+  if (containsAny(t, ['hcl', 'hydrochloric', 'sulfuric', 'sulphuric', 'nitric', 'acid chloride', 'thionyl', 'corrosive'])) return 'GLR/Hastelloy preferred';
+  if (containsAny(t, ['methanol', 'ethanol', 'acetone', 'ipa', 'toluene', 'ethyl acetate', 'organic solvent'])) return 'SS316L/GLR';
+  return 'SS316L or equivalent';
+}
+
+function detectMoc(text) {
+  const t = String(text || '').toLowerCase();
+  if (containsAny(t, ['hastelloy'])) return 'Hastelloy';
+  if (containsAny(t, ['glass lined', 'glr'])) return 'GLR';
+  if (containsAny(t, ['316', 'ss316', 'ss 316'])) return 'SS316L';
+  if (containsAny(t, ['304', 'ss304', 'ss 304'])) return 'SS304';
+  return 'Not specified';
+}
+
+function defaultStepHours(type) {
+  return ({ reactor: 8, centrifuge: 3, filter: 4, 'filter dryer': 8, dryer: 10, mill: 2, blender: 2 })[type] || 4;
+}
+
+function defaultCleaningHours(type) {
+  return ({ reactor: 4, centrifuge: 3, filter: 3, 'filter dryer': 5, dryer: 4, mill: 2, blender: 2 })[type] || 3;
+}
+
+function estimateLoad(type, batchKg) {
+  if (!batchKg) return 0;
+  if (type === 'reactor') return Math.ceil(batchKg * 3);
+  if (type === 'dryer' || type === 'centrifuge' || type === 'filter dryer') return Math.ceil(batchKg * 1.2);
+  if (type === 'filter') return Math.ceil(batchKg);
+  return Math.ceil(batchKg);
+}
+
+function buildStepAssumptions(desc, type, load, duration, moc) {
+  return 'Type inferred as ' + type + '; load estimated as ' + (load || 'not available') + '; duration ' + duration + ' h; MOC ' + moc + '.';
+}
+
+function mapEquipmentToSteps(steps, equipment) {
+  return steps.map(step => {
+    const candidates = equipment
+      .filter(eq => eq.type === step.type || compatibleType(eq.type, step.type))
+      .map(eq => ({ eq, score: equipmentScore(eq, step), reason: equipmentReason(eq, step) }))
+      .filter(item => item.score > -999)
+      .sort((a, b) => b.score - a.score);
+    const selected = candidates[0]?.eq || null;
+    return { ...step, selected, candidates: candidates.slice(0, 3) };
+  });
+}
+
+function compatibleType(equipmentType, stepType) {
+  if (stepType === 'filter' && equipmentType === 'filter dryer') return true;
+  if (stepType === 'dryer' && equipmentType === 'filter dryer') return true;
+  return false;
+}
+
+function equipmentScore(eq, step) {
+  if (step.requiredLoad && eq.maxCapacity && eq.maxCapacity < step.requiredLoad) return -1000;
+  if (step.requiredLoad && eq.minCapacity && eq.minCapacity > step.requiredLoad) return -1000;
+  let score = 100;
+  if (step.requiredLoad && eq.maxCapacity) score -= Math.min(40, Math.abs(eq.maxCapacity - step.requiredLoad) / Math.max(step.requiredLoad, 1) * 10);
+  if (mocMatches(eq.moc, step.requiredMoc)) score += 15;
+  if (eq.agitator && eq.agitator !== 'Not specified' && step.type === 'reactor') score += 5;
+  return score;
+}
+
+function mocMatches(actual, required) {
+  const a = String(actual || '').toLowerCase();
+  const r = String(required || '').toLowerCase();
+  if (r.includes('glr') || r.includes('hastelloy')) return a.includes('glr') || a.includes('glass') || a.includes('hastelloy');
+  if (r.includes('ss316')) return a.includes('316') || a.includes('glr') || a.includes('hastelloy') || a.includes('not specified');
+  return true;
+}
+
+function equipmentReason(eq, step) {
+  const capacity = eq.maxCapacity ? eq.maxCapacity + ' capacity' : 'capacity not specified';
+  return capacity + '; MOC ' + eq.moc + '; cleaning ' + eq.cleaningHours + ' h';
+}
+
+function summarizeProductionPlan(steps, equipment, data) {
+  const totalCycle = steps.reduce((sum, step) => sum + step.durationHours + step.cleaningHours, 0);
+  const byType = {};
+  steps.forEach(step => {
+    const available = equipment.filter(eq => eq.type === step.type || compatibleType(eq.type, step.type)).length || 1;
+    byType[step.type] ||= { hours: 0, available };
+    byType[step.type].hours += step.durationHours + step.cleaningHours;
+  });
+  const bottlenecks = Object.entries(byType).map(([type, info]) => ({
+    type,
+    available: info.available,
+    loadHours: Math.round((info.hours / info.available) * 10) / 10
+  })).sort((a, b) => b.loadHours - a.loadHours);
+  const chargingInterval = bottlenecks[0]?.loadHours || totalCycle;
+  const batchesPerDay = data.workingHoursPerDay ? data.workingHoursPerDay / chargingInterval : 24 / chargingInterval;
+  const monthlyKg = data.batchSizeKg ? Math.floor(batchesPerDay * 26 * data.batchSizeKg) : 0;
+  return {
+    totalCycle: Math.round(totalCycle * 10) / 10,
+    chargingInterval: Math.round(chargingInterval * 10) / 10,
+    batchesPerDay: Math.round(batchesPerDay * 100) / 100,
+    monthlyKg,
+    bottleneck: bottlenecks[0] || null,
+    unmapped: steps.filter(step => !step.selected).length
+  };
+}
+
+function renderEquipmentPlanMarkdown(plan) {
+  const rows = plan.steps.map(step => [
+    step.stepNo,
+    step.type,
+    step.requiredLoad ? step.requiredLoad : '-',
+    step.durationHours + ' h',
+    step.selected ? step.selected.id : 'No match',
+    step.candidates.map(c => c.eq.id).join(', ') || '-'
+  ]);
+  return '<div class="planner-output">' +
+    '<h3>Equipment Mapping and Production Plan</h3>' +
+    '<div class="planner-summary">' +
+      plannerKpi('Product', plan.data.productName + ' / ' + plan.data.productCode) +
+      plannerKpi('Batch Size', plan.data.batchSizeText) +
+      plannerKpi('Cycle Time', plan.summary.totalCycle + ' h') +
+      plannerKpi('Charging Interval', plan.summary.chargingInterval + ' h') +
+      plannerKpi('Estimated Output', plan.summary.monthlyKg ? plan.summary.monthlyKg + ' kg/month' : 'Target not calculated') +
+      plannerKpi('Bottleneck', plan.summary.bottleneck ? plan.summary.bottleneck.type + ' (' + plan.summary.bottleneck.loadHours + ' h)' : 'None') +
+    '</div>' +
+    table(['Step','Equipment Type','Load/Volume','Duration','Selected Equipment','Alternates'], rows) +
+    '<p><strong>Planning note:</strong> Use multiple mapped equipment in the bottleneck stage to reduce charging interval. Review inferred loads, MOC, and cleaning assumptions before final production scheduling.</p>' +
+    '<button class="profile-save-btn" onclick="printLastEquipmentPlan()">Print / Save Plan PDF</button>' +
+  '</div>';
+}
+
+function plannerKpi(label, value) {
+  return '<div class="planner-kpi"><b>' + escapeHtml(label) + '</b><span>' + escapeHtml(value) + '</span></div>';
+}
+
+function printLastEquipmentPlan() {
+  if (!lastEquipmentPlan) {
+    alert('Generate an equipment plan first.');
+    return;
+  }
+  openPrintableReport(buildEquipmentPlanReport(lastEquipmentPlan), 'Equipment Mapping and Production Planning');
+}
+
+function buildEquipmentPlanReport(plan) {
+  const today = new Date().toLocaleDateString();
+  const mappingRows = plan.steps.map(step => [
+    step.stepNo,
+    step.description,
+    step.type,
+    step.requiredLoad ? step.requiredLoad : '-',
+    step.requiredMoc,
+    step.durationHours + ' h',
+    step.cleaningHours + ' h',
+    step.selected ? step.selected.id : 'No suitable equipment',
+    step.candidates.map(c => c.eq.id + ' (' + c.reason + ')').join('; ') || '-'
+  ]);
+  const eqRows = plan.equipment.map(eq => [eq.id, eq.type, eq.minCapacity || '-', eq.maxCapacity || eq.capacity || '-', eq.moc, eq.agitator, eq.baffles, eq.cleaningHours + ' h', eq.location]);
+  return '<div class="report-shell">' +
+    '<div class="report-actions"><button onclick="window.print()">Print / Save as PDF</button><button onclick="window.close()">Close</button></div>' +
+    '<h1>Equipment Mapping and Production Planning Report</h1><p><strong>Generated:</strong> ' + escapeHtml(today) + '</p>' +
+    '<div class="report-meta">' +
+      '<div><strong>Product Name</strong><br>' + escapeHtml(plan.data.productName) + '</div>' +
+      '<div><strong>Product Code</strong><br>' + escapeHtml(plan.data.productCode) + '</div>' +
+      '<div><strong>Batch Size</strong><br>' + escapeHtml(plan.data.batchSizeText) + '</div>' +
+      '<div><strong>Working Hours/Day</strong><br>' + escapeHtml(plan.data.workingHoursPerDay) + '</div>' +
+    '</div>' +
+    '<h2>1. Planning Summary</h2>' + table(['Parameter','Result'], [
+      ['Estimated batch cycle time', plan.summary.totalCycle + ' h'],
+      ['Estimated minimum charging interval', plan.summary.chargingInterval + ' h'],
+      ['Estimated batches/day', String(plan.summary.batchesPerDay)],
+      ['Estimated monthly output', plan.summary.monthlyKg ? plan.summary.monthlyKg + ' kg/month' : 'Not calculated'],
+      ['Primary bottleneck', plan.summary.bottleneck ? plan.summary.bottleneck.type + ' stage' : 'None'],
+      ['Unmapped process steps', String(plan.summary.unmapped)]
+    ]) +
+    '<h2>2. Equipment Master Used</h2>' + table(['Equipment','Type','Min','Max/Capacity','MOC','Agitator','Baffles','Cleaning','Location'], eqRows) +
+    '<h2>3. Process Step Mapping</h2>' + table(['Step','Process Description','Required Type','Load/Volume','Required MOC','Process Time','Cleaning Time','Selected Equipment','Alternate Options'], mappingRows) +
+    '<h2>4. Bottleneck and Multi-Equipment Strategy</h2><p>The minimum charging interval is estimated from the highest equipment-family load after considering available parallel equipment. To improve charging frequency, add parallel equipment or reduce cleaning/processing time at the bottleneck stage.</p>' +
+    '<h2>5. Assumptions</h2><ul><li>Process requirements were inferred from uploaded text/table and must be reviewed by Production, QA, QC, and Engineering.</li><li>Capacity units are treated as comparable planning units where exact unit basis is not supplied.</li><li>Cleaning time uses equipment-type defaults unless provided in the equipment master.</li><li>MOC recommendations are keyword-based and require technical confirmation for corrosive or pressure reactions.</li></ul>' +
+    '<h2>6. Approval</h2>' + signatureTable() +
+  '</div>';
+}
+
 function init() {
   renderSavedDrugs();
+  renderDrugSearch();
   renderChatMemory();
   restoreChat();
   if (!apiKey) setTimeout(openSettings, 600);
