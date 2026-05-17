@@ -25,7 +25,7 @@ function closeSettings() {
 
 function getPlanningInputs() {
   const value = id => (document.getElementById(id)?.value || '').trim();
-  return {
+  const data = {
     productName: value('plan-product-name'),
     productCode: value('plan-product-code'),
     batchSizeText: value('plan-batch-size'),
@@ -33,8 +33,17 @@ function getPlanningInputs() {
     outputTargetKg: extractNumber(value('plan-output-target')) || 0,
     workingHoursPerDay: extractNumber(value('plan-shifts')) || 24,
     equipmentText: value('equipment-master-input') || storage.getEquipmentMaster(),
-    processText: value('process-input')
+    processText: value('process-input'),
+    dynamicVars: {}
   };
+  
+  const dynInputs = document.querySelectorAll('#dynamic-vars-list input');
+  dynInputs.forEach(input => {
+    const key = input.id.replace('dyn-var-', '');
+    data.dynamicVars[key] = input.value.trim();
+  });
+  
+  return data;
 }
 
 function initEvents() {
@@ -227,14 +236,34 @@ function updateEquipmentMasterStatus() {
 // PV Template Functions
 function savePvTemplate() {
   const textarea = document.getElementById('protocol-input');
-  const text = textarea.value.trim();
+  let text = textarea.value.trim();
   if (!text) {
     alert('Paste or upload a Process Validation Protocol before saving.');
     return;
   }
+  
+  // Auto-parameterize the template by replacing the detected product details with placeholders
+  const nameMatch = text.match(/(?:Product Name|Product|Name of Product|Name)\s*[:\-]?\s*([A-Za-z0-9\-\s\(\)]+?)(?=\n|\r|\||(?:\s{3,}))/i);
+  if (nameMatch && nameMatch[1]) {
+    const oldName = nameMatch[1].trim();
+    if (oldName.length > 3) text = text.split(oldName).join('{{PRODUCT_NAME}}');
+  }
+
+  const codeMatch = text.match(/(?:Product Code|Item Code|Code|Material Code)\s*[:\-]?\s*([A-Za-z0-9\-]+)/i);
+  if (codeMatch && codeMatch[1]) {
+    const oldCode = codeMatch[1].trim();
+    if (oldCode.length > 2) text = text.split(oldCode).join('{{PRODUCT_CODE}}');
+  }
+
+  const batchMatch = text.match(/(?:Batch Size|B\.S\.|Std\. Batch Size|Batch Quantity)\s*[:\-]?\s*([\d\.,]+\s*(?:kg|g|mg|l|ml|kl|pcs|nos))/i);
+  if (batchMatch && batchMatch[1]) {
+    const oldBatch = batchMatch[1].trim();
+    if (oldBatch.length > 1) text = text.split(oldBatch).join('{{BATCH_SIZE}}');
+  }
+
   storage.setPvTemplate(text);
   updatePvTemplateStatus();
-  showToast('Default PV Template saved');
+  showToast('Default PV Template saved with auto-placeholders');
 }
 
 function loadSavedPvTemplate() {
@@ -260,6 +289,9 @@ function updatePvTemplateStatus() {
   const status = document.getElementById('pv-template-status');
   const current = document.getElementById('protocol-input').value.trim();
   const saved = storage.getPvTemplate();
+  
+  updateDynamicVariablesUI(current || saved);
+  
   if (!status) return;
   if (saved && current && current === saved) {
     status.textContent = 'Default template loaded. Ready to generate.';
@@ -272,6 +304,44 @@ function updatePvTemplateStatus() {
   } else {
     status.textContent = 'No default template saved. Upload once to set it.';
   }
+}
+
+function updateDynamicVariablesUI(text) {
+  const container = document.getElementById('dynamic-vars-container');
+  const list = document.getElementById('dynamic-vars-list');
+  if (!text || !container || !list) return;
+  
+  const regex = /\{\{([A-Z0-9_ %.]+)\}\}/g;
+  const matches = [...text.matchAll(regex)].map(m => m[1]);
+  const uniqueVars = [...new Set(matches)];
+  
+  const standardVars = ['PRODUCT_NAME', 'PRODUCT_CODE', 'BATCH_SIZE'];
+  const dynamicVars = uniqueVars.filter(v => !standardVars.includes(v));
+  
+  if (dynamicVars.length === 0) {
+    container.style.display = 'none';
+    list.innerHTML = '';
+    return;
+  }
+  
+  container.style.display = 'block';
+  list.innerHTML = '';
+  
+  const savedVars = storage.getDynamicVars();
+  
+  dynamicVars.forEach(v => {
+    const input = document.createElement('input');
+    input.className = 'panel-input';
+    input.id = 'dyn-var-' + v;
+    input.placeholder = v.replace(/_/g, ' ');
+    if (savedVars[v]) input.value = savedVars[v];
+    
+    input.addEventListener('input', (e) => {
+      storage.setDynamicVar(v, e.target.value);
+    });
+    
+    list.appendChild(input);
+  });
 }
 
 async function sendPrompt(text) {
