@@ -104,20 +104,76 @@ function initEvents() {
     if (e.target?.id === 'inline-print-protocol') printProtocol();
   });
 
-  document.getElementById('save-pv-template-btn').addEventListener('click', savePvTemplate);
-  document.getElementById('load-pv-template-btn').addEventListener('click', loadSavedPvTemplate);
-  document.getElementById('clear-pv-template-btn').addEventListener('click', clearSavedPvTemplate);
-  document.getElementById('protocol-input').addEventListener('input', updatePvTemplateStatus);
+  document.getElementById('protocol-file').addEventListener('change', async e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.name.endsWith('.docx')) {
+      chat.addMessage('user', `Uploaded ${file.name}`);
+      chat.addMessage('assistant', `Processing template...`);
+      try {
+        const buffer = await file.arrayBuffer();
+        storage.setPvTemplateDocx(buffer);
+        
+        // Extract raw text to find placeholders
+        import { extractDocxText } from './utils.js';
+        const text = await extractDocxText(buffer);
+        updateDynamicVariablesUI(text);
+        
+        document.getElementById('pv-template-status').textContent = 'Template loaded. Ready to generate.';
+        chat.addMessage('assistant', `Template "${file.name}" loaded successfully. The original formatting will be preserved 100%.`);
+      } catch (err) {
+        chat.addMessage('assistant', `**Error parsing ${file.name}:** ` + err.message);
+      }
+    } else {
+      alert("Please upload a .docx file for the template to preserve formatting.");
+    }
+  });
+
+  document.getElementById('clear-pv-template-btn').addEventListener('click', () => {
+    if (!confirm('Clear the default PV Template from this browser?')) return;
+    storage.clearPvTemplate();
+    document.getElementById('protocol-file').value = '';
+    document.getElementById('pv-template-status').textContent = 'Upload your .docx template with {{PLACEHOLDERS}} to generate.';
+    updateDynamicVariablesUI('');
+    showToast('Default PV Template cleared');
+  });
 
   document.getElementById('format-protocol-btn').addEventListener('click', () => {
     try {
       const meta = getPlanningInputs();
-      const rawText = document.getElementById('protocol-input').value || storage.getPvTemplate();
-      if (!rawText) throw new Error('No Process Validation Protocol text found. Please upload a template or load the default one.');
+      const buffer = storage.getPvTemplateDocx();
+      if (!buffer) throw new Error('Please upload a .docx template first.');
       
-      const html = formatProtocol(rawText, meta);
-      chat.addMessage('assistant', 'Process Validation Protocol formatted. Opening in Artifact Panel...');
-      artifactPanel.open(html, 'PV Protocol' + (meta.productName ? ' - ' + meta.productName : ''));
+      chat.addMessage('user', 'Generate PV Protocol with 100% original formatting.');
+      chat.addMessage('assistant', 'Generating .docx file... Please check your downloads.');
+      
+      const zip = new PizZip(buffer);
+      const doc = new window.docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+      });
+      
+      // Prepare data
+      const data = {
+        PRODUCT_NAME: meta.productName || '________________',
+        PRODUCT_CODE: meta.productCode || '________________',
+        BATCH_SIZE: meta.batchSizeText || '________________',
+        ...meta.dynamicVars
+      };
+      
+      doc.render(data);
+      const out = doc.getZip().generate({
+        type: "blob",
+        mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      });
+      
+      const url = URL.createObjectURL(out);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Process_Validation_Protocol_${meta.productName || 'Generated'}.docx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
     } catch (err) {
       alert(err.message);
     }
@@ -227,78 +283,7 @@ function updateEquipmentMasterStatus() {
   }
 }
 
-// PV Template Functions
-function savePvTemplate() {
-  const textarea = document.getElementById('protocol-input');
-  let text = textarea.value.trim();
-  if (!text) {
-    alert('Paste or upload a Process Validation Protocol before saving.');
-    return;
-  }
-  
-  // Auto-parameterize the template by replacing the detected product details with placeholders
-  const nameMatch = text.match(/(?:Product Name|Product|Name of Product|Name)\s*[:\-]?\s*([A-Za-z0-9\-\s\(\)]+?)(?=\n|\r|\||(?:\s{3,}))/i);
-  if (nameMatch && nameMatch[1]) {
-    const oldName = nameMatch[1].trim();
-    if (oldName.length > 3) text = text.split(oldName).join('{{PRODUCT_NAME}}');
-  }
-
-  const codeMatch = text.match(/(?:Product Code|Item Code|Code|Material Code)\s*[:\-]?\s*([A-Za-z0-9\-]+)/i);
-  if (codeMatch && codeMatch[1]) {
-    const oldCode = codeMatch[1].trim();
-    if (oldCode.length > 2) text = text.split(oldCode).join('{{PRODUCT_CODE}}');
-  }
-
-  const batchMatch = text.match(/(?:Batch Size|B\.S\.|Std\. Batch Size|Batch Quantity)\s*[:\-]?\s*([\d\.,]+\s*(?:kg|g|mg|l|ml|kl|pcs|nos))/i);
-  if (batchMatch && batchMatch[1]) {
-    const oldBatch = batchMatch[1].trim();
-    if (oldBatch.length > 1) text = text.split(oldBatch).join('{{BATCH_SIZE}}');
-  }
-
-  storage.setPvTemplate(text);
-  updatePvTemplateStatus();
-  showToast('Default PV Template saved with auto-placeholders');
-}
-
-function loadSavedPvTemplate() {
-  const saved = storage.getPvTemplate();
-  if (!saved) {
-    alert('No default PV template found. Upload your template once and click "Save as Default".');
-    return;
-  }
-  document.getElementById('protocol-input').value = saved;
-  updatePvTemplateStatus();
-  showToast('Default PV Template loaded');
-}
-
-function clearSavedPvTemplate() {
-  if (!confirm('Clear the default PV Template from this browser?')) return;
-  storage.clearPvTemplate();
-  document.getElementById('protocol-input').value = '';
-  updatePvTemplateStatus();
-  showToast('Default PV Template cleared');
-}
-
-function updatePvTemplateStatus() {
-  const status = document.getElementById('pv-template-status');
-  const current = document.getElementById('protocol-input').value.trim();
-  const saved = storage.getPvTemplate();
-  
-  updateDynamicVariablesUI(current || saved);
-  
-  if (!status) return;
-  if (saved && current && current === saved) {
-    status.textContent = 'Default template loaded. Ready to generate.';
-  } else if (saved && current && current !== saved) {
-    status.textContent = 'Default template exists, but textarea has different/unsaved text.';
-  } else if (saved) {
-    status.textContent = 'Default template available in background. You can generate directly.';
-  } else if (current) {
-    status.textContent = 'Template entered but not saved as default yet.';
-  } else {
-    status.textContent = 'No default template saved. Upload once to set it.';
-  }
-}
+// Removed old plain text PV Template Functions
 
 function updateDynamicVariablesUI(text) {
   const container = document.getElementById('dynamic-vars-container');
@@ -366,7 +351,11 @@ function loadSavedEquipmentMasterOnStart() {
   if (savedEq) document.getElementById('equipment-master-input').value = savedEq;
   updateEquipmentMasterStatus();
   
-  const savedPv = storage.getPvTemplate();
-  if (savedPv) document.getElementById('protocol-input').value = savedPv;
-  updatePvTemplateStatus();
+  const savedPv = storage.getPvTemplateDocx();
+  if (savedPv) {
+    document.getElementById('pv-template-status').textContent = 'Default template loaded. Ready to generate.';
+    import('./utils.js').then(module => {
+      module.extractDocxText(savedPv).then(text => updateDynamicVariablesUI(text));
+    });
+  }
 }
