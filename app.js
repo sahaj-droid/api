@@ -153,6 +153,7 @@ function initEvents() {
       const doc = new window.docxtemplater(zip, {
         paragraphLoop: true,
         linebreaks: true,
+        delimiters: { start: '{{', end: '}}' }
       });
       
       // Prepare data
