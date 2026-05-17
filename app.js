@@ -3,6 +3,7 @@ import { storage } from './storage.js';
 import { autoResize, extractNumber, readTextFile, showToast } from './utils.js';
 import { generateEquipmentPlan, printLastEquipmentPlan } from './planning.js';
 import { formatProtocol, printProtocol } from './protocols.js';
+import { artifactPanel } from './artifact.js';
 
 const chat = new ChatController({
   messagesEl: document.getElementById('messages'),
@@ -70,7 +71,7 @@ function initEvents() {
   document.getElementById('clear-equipment-master-btn').addEventListener('click', clearSavedEquipmentMaster);
   document.getElementById('equipment-master-input').addEventListener('input', updateEquipmentMasterStatus);
   document.getElementById('process-file').addEventListener('change', e => loadFileToTextarea(e, 'process-input'));
-  document.getElementById('protocol-file').addEventListener('change', e => loadFileToTextarea(e, 'protocol-input'));
+  document.getElementById('protocol-file').addEventListener('change', e => loadFileToTextarea(e, 'protocol-input', 'PV Protocol'));
 
   document.getElementById('map-plan-btn').addEventListener('click', () => {
     try {
@@ -78,12 +79,20 @@ function initEvents() {
       if (!data.productName || !data.productCode || !data.batchSizeText) throw new Error('Enter Product name, Product code and Batch size.');
       if (!data.equipmentText) throw new Error('Save or paste Equipment/Utility master first.');
       if (!data.processText) throw new Error('Paste/upload Process details.');
-      generateEquipmentPlan(data, (role, html) => chat.addMessage(role, html));
+      
+      // Let planning.js generate the HTML. But we capture it and put it in Artifact panel.
+      // Modifying generateEquipmentPlan to just return the HTML and data, but for now we can pass a callback that opens artifact
+      generateEquipmentPlan(data, (role, html) => {
+        chat.addMessage('assistant', 'Equipment Mapping and Production Plan generated. Opening in Artifact Panel...');
+        artifactPanel.open(html, 'Equipment Plan - ' + data.productName);
+      });
     } catch (err) {
       alert(err.message);
     }
   });
-  document.getElementById('print-plan-btn').addEventListener('click', printLastEquipmentPlan);
+  document.getElementById('print-plan-btn').addEventListener('click', () => {
+     chat.addMessage('assistant', 'Please use the "Print / Save PDF" button inside the Artifact Panel.');
+  });
   document.addEventListener('click', e => {
     if (e.target?.id === 'inline-print-plan') printLastEquipmentPlan();
     if (e.target?.id === 'inline-print-protocol') printProtocol();
@@ -93,18 +102,29 @@ function initEvents() {
     try {
       const meta = getPlanningInputs();
       const html = formatProtocol(document.getElementById('protocol-input').value, meta);
-      chat.addMessage('assistant', html);
+      chat.addMessage('assistant', 'Process Validation Protocol formatted. Opening in Artifact Panel...');
+      artifactPanel.open(html, 'PV Protocol' + (meta.productName ? ' - ' + meta.productName : ''));
     } catch (err) {
       alert(err.message);
     }
   });
-  document.getElementById('print-protocol-btn').addEventListener('click', printProtocol);
+  document.getElementById('print-protocol-btn').addEventListener('click', () => {
+     chat.addMessage('assistant', 'Please use the "Print / Save PDF" button inside the Artifact Panel.');
+  });
 }
 
-async function loadFileToTextarea(event, textareaId) {
+async function loadFileToTextarea(event, textareaId, docType = 'File') {
   const file = event.target.files?.[0];
   if (!file) return;
-  document.getElementById(textareaId).value = await readTextFile(file);
+  chat.addMessage('user', `Uploaded ${file.name}`);
+  chat.addMessage('assistant', `Parsing ${file.name}... Please wait.`);
+  try {
+    const text = await readTextFile(file);
+    document.getElementById(textareaId).value = text;
+    chat.addMessage('assistant', `Successfully extracted ${text.length} characters from ${file.name}. You can now review it in the side panel and generate the ${docType}.`);
+  } catch(e) {
+    chat.addMessage('assistant', `**Error parsing ${file.name}:** ` + e.message);
+  }
 }
 
 function saveEquipmentMaster() {
