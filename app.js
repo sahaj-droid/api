@@ -177,7 +177,13 @@ function initEvents() {
       URL.revokeObjectURL(url);
       
     } catch (err) {
-      alert(err.message);
+      console.error(err);
+      if (err.properties && err.properties.errors) {
+        const msgs = err.properties.errors.map(e => e.properties.explanation || e.message).join('\\n');
+        alert("Template Error:\\n" + msgs + "\\n\\nPlease check your Word file and fix the tags (e.g. remove extra {{ or }}).");
+      } else {
+        alert(err.message || 'An error occurred while formatting protocol.');
+      }
     }
   });
 }
