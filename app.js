@@ -98,10 +98,18 @@ function initEvents() {
     if (e.target?.id === 'inline-print-protocol') printProtocol();
   });
 
+  document.getElementById('save-pv-template-btn').addEventListener('click', savePvTemplate);
+  document.getElementById('load-pv-template-btn').addEventListener('click', loadSavedPvTemplate);
+  document.getElementById('clear-pv-template-btn').addEventListener('click', clearSavedPvTemplate);
+  document.getElementById('protocol-input').addEventListener('input', updatePvTemplateStatus);
+
   document.getElementById('format-protocol-btn').addEventListener('click', () => {
     try {
       const meta = getPlanningInputs();
-      const html = formatProtocol(document.getElementById('protocol-input').value, meta);
+      const rawText = document.getElementById('protocol-input').value || storage.getPvTemplate();
+      if (!rawText) throw new Error('No Process Validation Protocol text found. Please upload a template or load the default one.');
+      
+      const html = formatProtocol(rawText, meta);
       chat.addMessage('assistant', 'Process Validation Protocol formatted. Opening in Artifact Panel...');
       artifactPanel.open(html, 'PV Protocol' + (meta.productName ? ' - ' + meta.productName : ''));
     } catch (err) {
@@ -216,6 +224,56 @@ function updateEquipmentMasterStatus() {
   }
 }
 
+// PV Template Functions
+function savePvTemplate() {
+  const textarea = document.getElementById('protocol-input');
+  const text = textarea.value.trim();
+  if (!text) {
+    alert('Paste or upload a Process Validation Protocol before saving.');
+    return;
+  }
+  storage.setPvTemplate(text);
+  updatePvTemplateStatus();
+  showToast('Default PV Template saved');
+}
+
+function loadSavedPvTemplate() {
+  const saved = storage.getPvTemplate();
+  if (!saved) {
+    alert('No default PV template found. Upload your template once and click "Save as Default".');
+    return;
+  }
+  document.getElementById('protocol-input').value = saved;
+  updatePvTemplateStatus();
+  showToast('Default PV Template loaded');
+}
+
+function clearSavedPvTemplate() {
+  if (!confirm('Clear the default PV Template from this browser?')) return;
+  storage.clearPvTemplate();
+  document.getElementById('protocol-input').value = '';
+  updatePvTemplateStatus();
+  showToast('Default PV Template cleared');
+}
+
+function updatePvTemplateStatus() {
+  const status = document.getElementById('pv-template-status');
+  const current = document.getElementById('protocol-input').value.trim();
+  const saved = storage.getPvTemplate();
+  if (!status) return;
+  if (saved && current && current === saved) {
+    status.textContent = 'Default template loaded. Ready to generate.';
+  } else if (saved && current && current !== saved) {
+    status.textContent = 'Default template exists, but textarea has different/unsaved text.';
+  } else if (saved) {
+    status.textContent = 'Default template available in background. You can generate directly.';
+  } else if (current) {
+    status.textContent = 'Template entered but not saved as default yet.';
+  } else {
+    status.textContent = 'No default template saved. Upload once to set it.';
+  }
+}
+
 async function sendPrompt(text) {
   const input = document.getElementById('user-input');
   const prompt = String(text || '').trim();
@@ -235,7 +293,11 @@ loadSavedEquipmentMasterOnStart();
 if (!storage.getKey()) setTimeout(window.openSettings, 500);
 
 function loadSavedEquipmentMasterOnStart() {
-  const saved = storage.getEquipmentMaster();
-  if (saved) document.getElementById('equipment-master-input').value = saved;
+  const savedEq = storage.getEquipmentMaster();
+  if (savedEq) document.getElementById('equipment-master-input').value = savedEq;
   updateEquipmentMasterStatus();
+  
+  const savedPv = storage.getPvTemplate();
+  if (savedPv) document.getElementById('protocol-input').value = savedPv;
+  updatePvTemplateStatus();
 }
