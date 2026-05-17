@@ -7,6 +7,7 @@ let cache = {
   gemini_key: '',
   equipment_master: '',
   pv_template: '',
+  pv_template_docx: null,
   dynamic_vars: {}
 };
 
@@ -111,6 +112,13 @@ export const storage = {
   clearPvTemplate() {
     cache.pv_template = '';
     deleteFromDB('pv_template');
+    cache.pv_template_docx = null;
+    deleteFromDB('pv_template_docx');
+  },
+  getPvTemplateDocx() { return cache.pv_template_docx || null; },
+  setPvTemplateDocx(buffer) {
+    cache.pv_template_docx = buffer;
+    saveToDB('pv_template_docx', buffer);
   },
   getDynamicVars() { return cache.dynamic_vars || {}; },
   setDynamicVar(key, value) {
