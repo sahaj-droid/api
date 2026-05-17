@@ -99,9 +99,6 @@ function initEvents() {
       alert(err.message);
     }
   });
-  document.getElementById('print-plan-btn').addEventListener('click', () => {
-     chat.addMessage('assistant', 'Please use the "Print / Save PDF" button inside the Artifact Panel.');
-  });
   document.addEventListener('click', e => {
     if (e.target?.id === 'inline-print-plan') printLastEquipmentPlan();
     if (e.target?.id === 'inline-print-protocol') printProtocol();
@@ -124,9 +121,6 @@ function initEvents() {
     } catch (err) {
       alert(err.message);
     }
-  });
-  document.getElementById('print-protocol-btn').addEventListener('click', () => {
-     chat.addMessage('assistant', 'Please use the "Print / Save PDF" button inside the Artifact Panel.');
   });
 }
 
