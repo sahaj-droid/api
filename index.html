@@ -54,44 +54,81 @@
 
     <div class="app-layout">
       <aside class="side-panel">
-        <section class="panel-block">
-          <div class="panel-title">Equipment Planning</div>
-          <input class="panel-input" id="plan-product-name" placeholder="Product name" />
-          <input class="panel-input" id="plan-product-code" placeholder="Product code" />
-          <input class="panel-input" id="plan-batch-size" placeholder="Batch size, e.g. 100 kg" />
-          <input class="panel-input" id="plan-output-target" placeholder="Optional monthly target, e.g. 1000 kg" />
-          <input class="panel-input" id="plan-shifts" placeholder="Working hours/day, e.g. 24" />
-          <input class="panel-input" type="file" id="equipment-file" accept=".txt,.csv,.tsv" />
-          <textarea class="panel-textarea tall" id="equipment-master-input" placeholder="Paste equipment / utility master once: tag, type, capacity, min, max, MOC, agitator, baffles, cleaning time..."></textarea>
-          <div class="action-row three">
-            <button class="mini-action" id="save-equipment-master-btn">Save Master</button>
-            <button class="mini-action" id="load-equipment-master-btn">Load Saved</button>
-            <button class="mini-action" id="clear-equipment-master-btn">Clear</button>
+        <!-- 1. Product Details -->
+        <details class="panel-block accordion" open>
+          <summary class="panel-title">
+            <span>1. Product Details</span>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </summary>
+          <div class="panel-content">
+            <input class="panel-input" id="plan-product-name" placeholder="Product name" />
+            <input class="panel-input" id="plan-product-code" placeholder="Product code" />
+            <input class="panel-input" id="plan-batch-size" placeholder="Batch size, e.g. 100 kg" />
+            <input class="panel-input" id="plan-output-target" placeholder="Optional monthly target, e.g. 1000 kg" />
+            <input class="panel-input" id="plan-shifts" placeholder="Working hours/day, e.g. 24" />
           </div>
-          <p class="builder-note" id="equipment-master-status">No saved equipment master yet.</p>
-          <input class="panel-input" type="file" id="process-file" accept=".txt,.csv,.tsv,.pdf,.docx" />
-          <textarea class="panel-textarea tall" id="process-input" placeholder="Paste/upload process steps or BMR text."></textarea>
-          <div class="action-row">
-            <button class="mini-action" id="map-plan-btn">Map Plan</button>
-            <button class="mini-action" id="print-plan-btn">Plan PDF</button>
-          </div>
-        </section>
+        </details>
 
-        <section class="panel-block">
-          <div class="panel-title">PV Protocol Editor</div>
-          <input class="panel-input" type="file" id="protocol-file" accept=".txt,.csv,.md,.html,.pdf,.docx" />
-          <textarea class="panel-textarea tall" id="protocol-input" placeholder="Paste or upload Process Validation Protocol text here."></textarea>
-          <div class="action-row">
-            <button class="mini-action" id="format-protocol-btn">Fix/Edit</button>
-            <button class="mini-action" id="print-protocol-btn">PV PDF</button>
+        <!-- 2. Equipment Master -->
+        <details class="panel-block accordion">
+          <summary class="panel-title">
+            <span>2. Equipment Master</span>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </summary>
+          <div class="panel-content">
+            <input class="panel-input" type="file" id="equipment-file" accept=".txt,.csv,.tsv" />
+            <textarea class="panel-textarea tall" id="equipment-master-input" placeholder="Paste equipment / utility master once: tag, type, capacity, min, max, MOC, agitator, baffles, cleaning time..."></textarea>
+            <div class="action-row three">
+              <button class="mini-action" id="save-equipment-master-btn">Save</button>
+              <button class="mini-action" id="load-equipment-master-btn">Load</button>
+              <button class="mini-action" id="clear-equipment-master-btn">Clear</button>
+            </div>
+            <p class="builder-note" id="equipment-master-status">No saved equipment master yet.</p>
           </div>
-          <p class="builder-note">Upload TXT/CSV/MD/HTML/PDF/DOCX now.</p>
-        </section>
+        </details>
 
-        <section class="panel-block">
-          <div class="panel-title">Saved Work <button class="mini-action" id="clear-chat-btn">Reset</button></div>
-          <div id="chat-memory-list" class="side-list"></div>
-        </section>
+        <!-- 3. Mapping & Planning -->
+        <details class="panel-block accordion">
+          <summary class="panel-title">
+            <span>3. Mapping & Planning</span>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </summary>
+          <div class="panel-content">
+            <input class="panel-input" type="file" id="process-file" accept=".txt,.csv,.tsv,.pdf,.docx" />
+            <textarea class="panel-textarea tall" id="process-input" placeholder="Paste/upload process steps or BMR text."></textarea>
+            <div class="action-row">
+              <button class="mini-action" id="map-plan-btn" style="width:100%;grid-column:1/-1">Generate Equipment Plan</button>
+            </div>
+          </div>
+        </details>
+
+        <!-- 4. PV Protocol Editor -->
+        <details class="panel-block accordion">
+          <summary class="panel-title">
+            <span>4. PV Protocol Editor</span>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </summary>
+          <div class="panel-content">
+            <input class="panel-input" type="file" id="protocol-file" accept=".txt,.csv,.md,.html,.pdf,.docx" />
+            <textarea class="panel-textarea tall" id="protocol-input" placeholder="Paste or upload Process Validation Protocol text here."></textarea>
+            <div class="action-row">
+              <button class="mini-action" id="format-protocol-btn" style="width:100%;grid-column:1/-1">Generate PV Protocol</button>
+            </div>
+            <p class="builder-note">Upload TXT/CSV/MD/HTML/PDF/DOCX now.</p>
+          </div>
+        </details>
+
+        <!-- 5. Saved Work -->
+        <details class="panel-block accordion">
+          <summary class="panel-title">
+            <span>5. Saved Work</span>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </summary>
+          <div class="panel-content">
+            <div style="margin-bottom:8px"><button class="mini-action" id="clear-chat-btn" style="width:100%">Clear Chat History</button></div>
+            <div id="chat-memory-list" class="side-list"></div>
+          </div>
+        </details>
       </aside>
 
       <section class="chat-panel">
