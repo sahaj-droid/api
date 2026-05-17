@@ -25,13 +25,55 @@ export function autoResize(el) {
   el.style.height = Math.min(el.scrollHeight, 140) + 'px';
 }
 
-export function readTextFile(file) {
+export async function readTextFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  
+  if (ext === 'pdf') {
+    return await extractPdfText(file);
+  } else if (ext === 'docx') {
+    return await extractDocxText(file);
+  }
+
+  // Fallback to plain text reading
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result || ''));
     reader.onerror = () => reject(reader.error);
     reader.readAsText(file);
   });
+}
+
+async function extractDocxText(file) {
+  if (typeof mammoth === 'undefined') throw new Error("Mammoth.js not loaded. Please ensure internet connection.");
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const arrayBuffer = e.target.result;
+        // Extract raw text preserving basic structure
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        resolve(result.value);
+      } catch(err) {
+        reject(err);
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function extractPdfText(file) {
+  if (typeof pdfjsLib === 'undefined') throw new Error("PDF.js not loaded. Please ensure internet connection.");
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const strings = content.items.map(item => item.str);
+    fullText += strings.join(' ') + '\n\n';
+  }
+  return fullText;
 }
 
 export function renderMarkdown(text) {
