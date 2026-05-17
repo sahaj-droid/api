@@ -1,6 +1,6 @@
 import { ChatController } from './chat.js';
 import { storage } from './storage.js';
-import { autoResize, extractNumber, readTextFile, showToast } from './utils.js';
+import { autoResize, extractNumber, readTextFile, showToast, extractDocxText } from './utils.js';
 import { generateEquipmentPlan, printLastEquipmentPlan } from './planning.js';
 import { formatProtocol, printProtocol } from './protocols.js';
 import { artifactPanel } from './artifact.js';
@@ -115,7 +115,6 @@ function initEvents() {
         storage.setPvTemplateDocx(buffer);
         
         // Extract raw text to find placeholders
-        import { extractDocxText } from './utils.js';
         const text = await extractDocxText(buffer);
         updateDynamicVariablesUI(text);
         
