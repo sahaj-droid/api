@@ -6,7 +6,8 @@ let cache = {
   chat_history: [],
   gemini_key: '',
   equipment_master: '',
-  pv_template: ''
+  pv_template: '',
+  dynamic_vars: {}
 };
 
 function initDB() {
@@ -42,6 +43,9 @@ function initDB() {
            
            const legacyPv = localStorage.getItem('api_planner_pv_template');
            if (legacyPv) { cache.pv_template = legacyPv; saveToDB('pv_template', legacyPv); }
+           
+           cache.dynamic_vars = {};
+           saveToDB('dynamic_vars', {});
         } else {
            for (let i=0; i<keys.length; i++) {
              cache[keys[i]] = values[i];
@@ -107,5 +111,12 @@ export const storage = {
   clearPvTemplate() {
     cache.pv_template = '';
     deleteFromDB('pv_template');
+  },
+  getDynamicVars() { return cache.dynamic_vars || {}; },
+  setDynamicVar(key, value) {
+    const vars = cache.dynamic_vars || {};
+    vars[key] = value;
+    cache.dynamic_vars = vars;
+    saveToDB('dynamic_vars', vars);
   }
 };
