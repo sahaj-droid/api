@@ -8,10 +8,12 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css" />
   
-  <!-- PDF and DOCX Parsing -->
+  <!-- PDF and DOCX Parsing / Templating -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.4/pizzip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.11/docxtemplater.js"></script>
 </head>
 <body>
   <header>
@@ -107,25 +109,22 @@
           </div>
         </details>
 
-        <!-- 4. PV Protocol Editor -->
+        <!-- 4. PV Protocol Generator -->
         <details class="panel-block accordion">
           <summary class="panel-title">
-            <span>4. PV Protocol Editor</span>
+            <span>4. PV Protocol Generator</span>
             <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </summary>
           <div class="panel-content">
-            <p class="builder-note" id="pv-template-status" style="margin-top:0">No default template saved.</p>
-            <input class="panel-input" type="file" id="protocol-file" accept=".txt,.csv,.md,.html,.pdf,.docx" title="Upload template" />
-            <textarea class="panel-textarea tall" id="protocol-input" placeholder="Paste or upload Process Validation Protocol text here."></textarea>
+            <p class="builder-note" id="pv-template-status" style="margin-top:0">Upload your .docx template with {{PLACEHOLDERS}} to generate.</p>
+            <input class="panel-input" type="file" id="protocol-file" accept=".docx" title="Upload .docx template" />
             
             <div class="action-row three" style="margin-bottom: 8px;">
-              <button class="mini-action" id="save-pv-template-btn">Save as Default</button>
-              <button class="mini-action" id="load-pv-template-btn">Load Default</button>
-              <button class="mini-action" id="clear-pv-template-btn">Clear Default</button>
+              <button class="mini-action" id="clear-pv-template-btn">Clear Template</button>
             </div>
             
             <div class="action-row">
-              <button class="mini-action" id="format-protocol-btn" style="width:100%;grid-column:1/-1">Generate PV Protocol</button>
+              <button class="mini-action" id="format-protocol-btn" style="width:100%;grid-column:1/-1">Download Generated Protocol (.docx)</button>
             </div>
           </div>
         </details>
