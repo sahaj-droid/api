@@ -108,3 +108,65 @@ main { max-width: 1180px; width: 100%; margin: 0 auto; padding: 0 24px; position
 .report-actions button { background: #0f6e56; border: 0; border-radius: 6px; color: #fff; cursor: pointer; padding: 8px 12px; margin-right: 8px; }
 @media print { body { background: #fff !important; } .report-actions { display: none; } .report-shell { padding: 0; } }
 @media (max-width: 860px) { main { padding: 0 14px; } .app-layout { grid-template-columns: 1fr; } .side-panel { position: static; max-height: none; } .header-sub { display: none; } .bubble { max-width: 92%; } .report-meta { grid-template-columns: 1fr; } }
+
+/* Artifact Panel */
+.art-panel {
+  position: fixed;
+  top: 64px;
+  right: -50vw;
+  width: 45vw;
+  min-width: 400px;
+  max-width: 800px;
+  height: calc(100vh - 64px);
+  background: var(--bg-card);
+  border-left: 1px solid var(--border);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.4);
+  z-index: 150;
+  transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+.art-panel.open {
+  right: 0;
+}
+.art-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(29,158,117,0.1);
+  background: rgba(10,15,13,0.95);
+}
+.art-title-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.art-title-bar h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text-1);
+  font-weight: normal;
+}
+.art-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 24px;
+  background: rgba(29,158,117,0.03);
+  border-bottom: 1px solid rgba(29,158,117,0.1);
+}
+.art-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+/* When panel is open, shrink main layout to prevent overlap on large screens */
+body:has(.art-panel.open) .app-layout {
+  padding-right: clamp(10px, calc(45vw - ((100vw - 1180px) / 2)), 45vw);
+  transition: padding-right 0.35s;
+}
+
+@media (max-width: 960px) {
+  .art-panel { width: 100vw; min-width: 0; right: -100vw; }
+  body:has(.art-panel.open) .app-layout { padding-right: 0; }
+}
