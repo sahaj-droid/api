@@ -7,6 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css" />
+  
+  <!-- PDF and DOCX Parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body>
   <header>
@@ -64,7 +69,7 @@
             <button class="mini-action" id="clear-equipment-master-btn">Clear</button>
           </div>
           <p class="builder-note" id="equipment-master-status">No saved equipment master yet.</p>
-          <input class="panel-input" type="file" id="process-file" accept=".txt,.csv,.tsv" />
+          <input class="panel-input" type="file" id="process-file" accept=".txt,.csv,.tsv,.pdf,.docx" />
           <textarea class="panel-textarea tall" id="process-input" placeholder="Paste/upload process steps or BMR text."></textarea>
           <div class="action-row">
             <button class="mini-action" id="map-plan-btn">Map Plan</button>
@@ -74,13 +79,13 @@
 
         <section class="panel-block">
           <div class="panel-title">PV Protocol Editor</div>
-          <input class="panel-input" type="file" id="protocol-file" accept=".txt,.csv,.md,.html" />
+          <input class="panel-input" type="file" id="protocol-file" accept=".txt,.csv,.md,.html,.pdf,.docx" />
           <textarea class="panel-textarea tall" id="protocol-input" placeholder="Paste or upload Process Validation Protocol text here."></textarea>
           <div class="action-row">
             <button class="mini-action" id="format-protocol-btn">Fix/Edit</button>
             <button class="mini-action" id="print-protocol-btn">PV PDF</button>
           </div>
-          <p class="builder-note">Upload TXT/CSV/MD/HTML now. Word/PDF parsing can be added after this refactor.</p>
+          <p class="builder-note">Upload TXT/CSV/MD/HTML/PDF/DOCX now.</p>
         </section>
 
         <section class="panel-block">
@@ -120,6 +125,26 @@
     </div>
   </main>
 
+  <!-- Artifact Panel -->
+  <div id="art-panel" class="art-panel">
+    <div class="art-header">
+      <div class="art-title-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" style="color:var(--accent)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <h2 id="art-title">Generated Report</h2>
+      </div>
+      <button class="plain-btn" id="art-close" title="Close Panel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <div class="art-toolbar">
+      <button class="mini-action" id="art-print">Print / Save PDF</button>
+      <button class="mini-action" id="art-copy">Copy Content</button>
+    </div>
+    <div id="art-content" class="art-content"></div>
+  </div>
+
+  <!-- Note: We changed scripts to load app.js which will bootstrap everything -->
+  <script type="module" src="./artifact.js"></script>
   <script type="module" src="./app.js"></script>
 </body>
 </html>
