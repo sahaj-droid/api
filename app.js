@@ -146,7 +146,10 @@ function initEvents() {
       chat.addMessage('user', 'Generate PV Protocol with 100% original formatting.');
       chat.addMessage('assistant', 'Generating .docx file... Please check your downloads.');
       
-      const zip = new PizZip(buffer);
+      if (!window.PizZip) throw new Error("PizZip library did not load. Please check your internet connection.");
+      if (!window.docxtemplater) throw new Error("Docxtemplater library did not load.");
+
+      const zip = new window.PizZip(buffer);
       const doc = new window.docxtemplater(zip, {
         paragraphLoop: true,
         linebreaks: true,
